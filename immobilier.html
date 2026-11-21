@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Immobilier à Abidjan — Achat et vente de biens | MCS</title>
+<meta name="description" content="Villas, appartements, terrains et immeubles à vendre à Abidjan. MCS vous accompagne de la visite à la signature.">
+<meta property="og:title" content="Immobilier à Abidjan — Achat et vente de biens | MCS">
+<meta property="og:description" content="Villas, appartements, terrains et immeubles à vendre à Abidjan. MCS vous accompagne de la visite à la signature.">
+<meta property="og:image" content="assets/img/logo-complet.jpg">
+<meta name="theme-color" content="#0C2D63">
+<link rel="icon" href="assets/img/favicon.png">
+<link rel="apple-touch-icon" href="assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="charge" data-page="immobilier">
+
+<div class="chargement" id="chargement" aria-hidden="true">
+  <div class="volet h"></div><div class="volet b"></div>
+  <div class="centre"><div class="logo3d"><img src="assets/img/logo.png" alt=""></div><div class="jauge"><i id="jauge-chargement"></i></div></div>
+</div>
+<div class="point" aria-hidden="true"></div>
+<div class="anneau" aria-hidden="true"><span></span></div>
+<div class="apercu" aria-hidden="true"></div>
+
+<header class="entete" id="entete">
+  <div class="wrap">
+    <a class="marque" href="index.html" aria-label="MCS, accueil" data-libelle="Accueil"><img src="assets/img/logo.png" alt="MCS"></a>
+    <nav class="menu" id="menu" aria-label="Navigation principale">
+      <span class="indic" aria-hidden="true"></span>
+      <a href="index.html" data-page="accueil">Accueil</a><a href="a-propos.html" data-page="apropos">À propos</a><a href="realisations.html" data-page="realisations">Réalisations</a><a href="metiers.html" data-page="metiers">Nos métiers</a><a href="immobilier.html" data-page="immobilier">Immobilier</a><a href="actualites.html" data-page="actualites">Actualités</a><a href="contact.html" data-page="contact">Contact</a>
+    </nav>
+    <a class="btn btn-bleu" href="contact.html#formulaire" data-libelle="Devis">Demander un devis</a>
+    <button class="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="tiroir" id="burger"><span></span></button>
+  </div>
+</header>
+<nav class="tiroir" id="tiroir" aria-label="Menu mobile">
+  <a href="index.html" data-page="accueil">Accueil</a><a href="a-propos.html" data-page="apropos">À propos</a><a href="realisations.html" data-page="realisations">Réalisations</a><a href="metiers.html" data-page="metiers">Nos métiers</a><a href="immobilier.html" data-page="immobilier">Immobilier</a><a href="actualites.html" data-page="actualites">Actualités</a><a href="contact.html" data-page="contact">Contact</a>
+  <a class="btn btn-jaune" href="contact.html#formulaire">Demander un devis</a>
+</nav>
+
+<main>
+<section class="page-hero sombre ">
+  <span class="arc" style="width:520px;height:520px;border-width:70px;right:-200px;top:-220px" aria-hidden="true"></span>
+  <span class="arc" style="width:260px;height:260px;border-width:36px;left:-120px;bottom:-150px" aria-hidden="true"></span>
+  <div class="wrap">
+    <div>
+      <nav class="fil" aria-label="Fil d’Ariane"><a href="index.html">Accueil</a><i></i>Immobilier</nav>
+      <h1 class="anime"><span class="ligne"><span>Acheter ou vendre</span></span><span class="ligne"><span>un bien, en toute</span></span><span class="ligne"><span>confiance.</span></span></h1>
+      <p class="chapo">Villas, appartements, terrains et immeubles à Abidjan. MCS vous accompagne de la visite à la signature, avec des biens dont nous connaissons la construction.</p>
+      
+      <div class="actions"><a class="btn btn-jaune" href="#biens" data-libelle="Voir">Voir les biens<i class="fleche"></i></a><a class="btn btn-trait" href="#vendre" data-libelle="Vendre">Vendre mon bien</a></div>
+    </div>
+    <div class="visuel"><img src="assets/img/pages/immobilier.jpg" alt="Poignée de main entre un client et un conseiller" style="object-position:55% center"></div>
+  </div>
+</section>
+<section class="bloc-s degrade" id="biens">
+  <div class="wrap">
+    <div class="entete-section"><div><span class="regle"></span><h2 class="revele">Biens disponibles</h2></div><p class="revele">Nos biens à vendre sont présentés ici, chacun avec sa fiche et la possibilité de demander une visite.</p></div>
+    <div class="barre-filtres">
+      <div class="filtres" data-cible="#grille-biens" data-attr="type" role="group" aria-label="Filtrer par type">
+        <button type="button" class="actif" data-filtre="*" aria-pressed="true">Tous</button><button type="button" data-filtre="Villa" aria-pressed="false">Villas</button><button type="button" data-filtre="Appartement" aria-pressed="false">Appartements</button><button type="button" data-filtre="Terrain" aria-pressed="false">Terrains</button><button type="button" data-filtre="Immeuble" aria-pressed="false">Immeubles</button>
+      </div>
+      <label class="recherche"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#4A5C78" stroke-width="2" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg><input type="search" data-recherche="#grille-biens" placeholder="Commune, quartier…" aria-label="Rechercher une commune ou un quartier"></label>
+      <span class="compte"></span>
+    </div>
+    <div class="grille-biens" id="grille-biens" data-rendu="biens"></div>
+    <p class="vide-filtre" hidden>Aucun bien ne correspond pour le moment. Dites-nous ce que vous cherchez, nous vous prévenons dès qu’un bien se libère.</p>
+  </div>
+</section>
+
+<section class="bloc-s clair" id="vendre">
+  <div class="wrap">
+    <div class="vendre revele">
+      <div class="gauche">
+        <span class="regle"></span>
+        <h2>Vous vendez un bien ?</h2>
+        <p>Confiez-nous la vente de votre villa, appartement, terrain ou immeuble. Nous trouvons des acheteurs sérieux et vous accompagnons jusqu’à la signature.</p>
+        <ol><li>Visite et estimation de votre bien</li><li>Photos et mise en ligne sur notre site</li><li>Visites avec des acheteurs qualifiés</li><li>Accompagnement jusqu’à la signature chez le notaire</li></ol>
+        <a class="btn btn-jaune" href="contact.html?projet=immobilier#formulaire" data-libelle="Vendre">Faire estimer mon bien<i class="fleche"></i></a>
+      </div>
+      <div class="droite"><svg data-ill="terrain"></svg></div>
+    </div>
+  </div>
+</section>
+<section class="bloc-s clair">
+  <div class="wrap faq-grille">
+    <div><span class="regle"></span><h2 class="revele">Acheter avec MCS</h2><p class="intro revele">Les questions que l’on nous pose le plus souvent.</p></div>
+    <div class="faq revele" data-faq="immobilier"><details><summary>Les documents des biens sont-ils vérifiés ?</summary><p>Oui. Avant toute mise en vente, nous vérifions les documents du bien (ACD, titre foncier, permis de construire selon le cas), pour que vous achetiez en toute sécurité.</p></details><details><summary>Puis-je visiter avant de m’engager ?</summary><p>Oui, toutes les visites se font sur rendez-vous, avec un conseiller MCS.</p></details><details><summary>Proposez-vous des facilités de paiement ?</summary><p>Oui. MCS propose des facilités de paiement pour rendre votre achat plus accessible. Les modalités sont définies avec vous selon le bien choisi et votre situation : contactez-nous pour en discuter.</p></details><details><summary>Je cherche un bien qui n’est pas sur le site.</summary><p>Dites-nous ce que vous cherchez (type, commune, budget). Nous vous prévenons dès qu’un bien correspondant est disponible.</p></details></div>
+  </div>
+</section><section class="appel">
+  <div class="wrap">
+    <div><h2 class="revele">Vous cherchez un bien précis ?</h2><p class="revele">Indiquez-nous le type de bien, la commune et votre budget : nous revenons vers vous avec des propositions.</p></div>
+    <div class="actions revele"><a class="btn btn-bleu" href="contact.html?projet=immobilier#formulaire" data-libelle="Devis">Décrire ma recherche<i class="fleche"></i></a><a class="btn btn-trait" data-lien="whatsapp" href="contact.html#formulaire" data-libelle="WhatsApp">Écrire sur WhatsApp</a></div>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="colonnes">
+      <div><img class="logo-pied" src="assets/img/logo.png" alt="MCS"><p style="margin:0;max-width:300px"><span data-info="slogan">Construire aujourd’hui le meilleur de demain.</span> Qualité, professionnalisme, engagement.</p>
+        <div class="reseaux"><a data-reseau="facebook" href="#">Facebook</a><a data-reseau="instagram" href="#">Instagram</a><a data-reseau="linkedin" href="#">LinkedIn</a><a class="reseau-ico" data-reseau="tiktok" href="#" aria-label="MCS sur TikTok" title="TikTok"><img src="assets/img/tiktok.png" alt="TikTok" width="40" height="40"></a></div></div>
+      <div><h4>Entreprise</h4><ul><li><a href="a-propos.html">À propos</a></li><li><a href="realisations.html">Réalisations</a></li><li><a href="actualites.html">Actualités</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+      <div><h4>Nos métiers</h4><ul><li><a href="metiers.html">Construction</a></li><li><a href="metiers.html">Gros œuvre</a></li><li><a href="metiers.html">Finition</a></li><li><a href="immobilier.html">Immobilier</a></li></ul></div>
+      <div><h4>Contact</h4><ul><li>Tél. <a data-lien="tel" data-info="telephone" href="contact.html">[Numéro]</a></li><li>WhatsApp <a data-lien="whatsapp" data-info="whatsappAffiche" href="contact.html">[WhatsApp]</a></li><li data-si="email"><a data-lien="email" data-info="email" href="contact.html">[Adresse email]</a></li><li data-info="adresse">[Adresse], Abidjan</li><li class="horaires" data-info="horaires">[Horaires]</li></ul></div>
+    </div>
+    <div class="bas"><span>© <span class="annee">2026</span> MCS. Tous droits réservés.</span><span class="signature">Site créé par <a href="https://www.zematechnologies.com" target="_blank" rel="noopener">ZEMA TECHNOLOGIES</a></span></div>
+  </div>
+</footer>
+
+<a class="wa" data-lien="whatsapp" href="contact.html#formulaire" aria-label="Écrire à MCS sur WhatsApp" data-libelle="WhatsApp"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" aria-hidden="true"><path d="M4 20l1.4-4A8 8 0 1 1 8 18.6z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 1c-1-.5-2-1.5-2.5-2.5l1-1-1-2z"/></svg></a>
+
+<script src="assets/js/donnees.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>

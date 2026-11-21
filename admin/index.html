@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>Administration MCS</title>
+<link rel="icon" href="../assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<!-- Connexion -->
+<div class="ecran-connexion" id="connexion" hidden>
+  <div class="visuel">
+    <img src="../assets/img/logo.png" alt="MCS">
+    <div>
+      <h1>Espace administrateur MCS</h1>
+      <p>Gérez les chantiers, projets, biens, actualités et demandes de votre site, et suivez vos visiteurs.</p>
+    </div>
+    <p style="font-size:13px">MALAUK CONSTRUCTION SERVICES</p>
+  </div>
+  <div class="formulaire">
+    <form class="carte-connexion" id="form-connexion" autocomplete="on">
+      <h2>Connexion</h2>
+      <p>Accès réservé à l’équipe MCS.</p>
+      <div class="champ"><label for="c-id">Identifiant</label><input id="c-id" name="identifiant" autocomplete="username" required></div>
+      <div class="champ"><label for="c-mdp">Mot de passe</label><input id="c-mdp" name="mdp" type="password" autocomplete="current-password" required></div>
+      <p class="erreur" id="c-erreur" aria-live="polite"></p>
+      <button class="btn btn-bleu" type="submit">Se connecter</button>
+      <div class="note-demo" id="note-demo"><b>Mode démonstration.</b> Premier accès : identifiant <b>admin</b>, mot de passe <b>MCS2026</b>. Il vous sera demandé de le changer.</div>
+    </form>
+  </div>
+</div>
+
+<!-- Application -->
+<div class="app" id="app" hidden>
+  <aside class="barre" id="barre">
+    <div class="marque"><img src="../assets/img/logo.png" alt=""><div><b>MCS Admin</b><small>Malauk Construction Services</small></div></div>
+    <nav id="nav"></nav>
+    <div class="bas"><b id="u-nom"></b><span id="u-role"></span></div>
+  </aside>
+  <div class="principal">
+    <header class="haut">
+      <button class="burger" id="burger" aria-label="Menu"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+      <h1 id="titre-page">Tableau de bord</h1>
+      <a class="btn btn-trait btn-petit" href="../index.html" target="_blank" rel="noopener">Voir le site
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 4h6v6M20 4l-9 9M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"/></svg></a>
+    </header>
+    <main class="contenu" id="contenu"></main>
+  </div>
+</div>
+
+<div class="voile" id="voile" hidden></div>
+<aside class="panneau" id="panneau" aria-modal="true" role="dialog" hidden>
+  <div class="tete"><h2 id="p-titre"></h2><button class="btn btn-trait btn-icone" id="p-fermer" aria-label="Fermer"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="corps" id="p-corps"></div>
+  <div class="pied" id="p-pied"></div>
+</aside>
+<div class="toast" id="toast" role="status"></div>
+
+<script src="../assets/js/donnees.js"></script>
+<script src="admin.js"></script>
+</body>
+</html>

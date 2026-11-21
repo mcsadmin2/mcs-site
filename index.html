@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>MCS — Construction, gros œuvre, finition et immobilier à Abidjan</title>
+<meta name="description" content="MCS construit, réalise le gros œuvre et les finitions de vos bâtiments à Abidjan, et vous accompagne dans l’achat ou la vente de biens. Une date de livraison écrite au contrat, et tenue.">
+<meta property="og:title" content="MCS — Construction, gros œuvre, finition et immobilier à Abidjan">
+<meta property="og:description" content="MCS construit, réalise le gros œuvre et les finitions de vos bâtiments à Abidjan, et vous accompagne dans l’achat ou la vente de biens. Une date de livraison écrite au contrat, et tenue.">
+<meta property="og:image" content="assets/img/logo-complet.jpg">
+<meta name="theme-color" content="#0C2D63">
+<link rel="icon" href="assets/img/favicon.png">
+<link rel="apple-touch-icon" href="assets/img/favicon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@300;400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/css/style.css">
+</head>
+<body class="charge" data-page="accueil">
+
+<div class="chargement" id="chargement" aria-hidden="true">
+  <div class="volet h"></div><div class="volet b"></div>
+  <div class="centre"><div class="logo3d"><img src="assets/img/logo.png" alt=""></div><div class="jauge"><i id="jauge-chargement"></i></div></div>
+</div>
+<div class="point" aria-hidden="true"></div>
+<div class="anneau" aria-hidden="true"><span></span></div>
+<div class="apercu" aria-hidden="true"></div>
+
+<header class="entete" id="entete">
+  <div class="wrap">
+    <a class="marque" href="index.html" aria-label="MCS, accueil" data-libelle="Accueil"><img src="assets/img/logo.png" alt="MCS"></a>
+    <nav class="menu" id="menu" aria-label="Navigation principale">
+      <span class="indic" aria-hidden="true"></span>
+      <a href="index.html" data-page="accueil">Accueil</a><a href="a-propos.html" data-page="apropos">À propos</a><a href="realisations.html" data-page="realisations">Réalisations</a><a href="metiers.html" data-page="metiers">Nos métiers</a><a href="immobilier.html" data-page="immobilier">Immobilier</a><a href="actualites.html" data-page="actualites">Actualités</a><a href="contact.html" data-page="contact">Contact</a>
+    </nav>
+    <a class="btn btn-bleu" href="contact.html#formulaire" data-libelle="Devis">Demander un devis</a>
+    <button class="burger" type="button" aria-label="Ouvrir le menu" aria-expanded="false" aria-controls="tiroir" id="burger"><span></span></button>
+  </div>
+</header>
+<nav class="tiroir" id="tiroir" aria-label="Menu mobile">
+  <a href="index.html" data-page="accueil">Accueil</a><a href="a-propos.html" data-page="apropos">À propos</a><a href="realisations.html" data-page="realisations">Réalisations</a><a href="metiers.html" data-page="metiers">Nos métiers</a><a href="immobilier.html" data-page="immobilier">Immobilier</a><a href="actualites.html" data-page="actualites">Actualités</a><a href="contact.html" data-page="contact">Contact</a>
+  <a class="btn btn-jaune" href="contact.html#formulaire">Demander un devis</a>
+</nav>
+
+<main>
+<section class="hero" id="accueil" aria-roledescription="carrousel" aria-label="MCS en images">
+  <div id="slider">
+  <div class="slide active" aria-roledescription="diapositive" aria-label="1 sur 4"><img src="assets/img/accueil/construction.jpg" alt="Grande villa blanche aux lignes arrondies" style="object-position:60% 60%" fetchpriority="high"></div>
+  <div class="slide" aria-roledescription="diapositive" aria-label="2 sur 4"><img src="assets/img/accueil/gros-oeuvre.jpg" alt="Structure en béton armé en cours de construction" style="object-position:center 40%" loading="eager"></div>
+  <div class="slide" aria-roledescription="diapositive" aria-label="3 sur 4"><img src="assets/img/accueil/finition.jpg" alt="Hall en marbre avec escalier en bois et garde-corps en verre" style="object-position:center 45%" loading="eager"></div>
+  <div class="slide" aria-roledescription="diapositive" aria-label="4 sur 4"><img src="assets/img/accueil/immobilier.jpg" alt="Villa contemporaine avec terrasse et piscine" style="object-position:center 38%" loading="eager"></div>
+  </div>
+  <div class="voile" aria-hidden="true"></div>
+  <div class="wrap contenu">
+    <div class="lieu"><i></i>Entreprise de construction à Abidjan</div>
+    <h1><span class="ligne"><span>Votre bâtiment,</span></span><span class="ligne"><span>livré à la date</span></span><span class="ligne"><span>inscrite au contrat.</span></span></h1>
+    <p class="chapo">Construction, gros œuvre, finition partielle ou complète, achat et vente de biens. MCS s’engage par écrit sur votre date de livraison, et la tient.</p>
+    <div class="actions">
+      <a class="btn btn-jaune" href="#contact" data-libelle="Devis">Demander un devis<i class="fleche"></i></a>
+      <a class="btn btn-trait" href="#chantier" data-libelle="Voir">Découvrir notre méthode</a>
+    </div>
+  </div>
+  <div class="bas"><div class="wrap"><div class="legendes" aria-live="polite"><p class="legende active">Villas et immeubles livrés clés en main</p><p class="legende">Fondations et structure réalisées selon les normes</p><p class="legende">Des intérieurs finis au détail près</p><p class="legende">Des biens sélectionnés, à acheter en toute confiance</p></div><div class="puces" id="puces"><button type="button" aria-label="Voir : Construction" class="courant"><span>01</span>Construction<i></i></button><button type="button" aria-label="Voir : Gros œuvre"><span>02</span>Gros œuvre<i></i></button><button type="button" aria-label="Voir : Finition"><span>03</span>Finition<i></i></button><button type="button" aria-label="Voir : Immobilier"><span>04</span>Immobilier<i></i></button></div></div></div>
+</section>
+
+<section class="engagements-bande">
+  <span class="arc" style="width:300px;height:300px;border-width:40px;left:-170px;top:-90px" aria-hidden="true"></span>
+  <div class="wrap">
+    <div class="engagements">
+      <div><b>Planning signé</b><span>Chaque étape et sa date de fin sont écrites au contrat, avant le démarrage.</span></div>
+      <div><b>Suivi chaque semaine</b><span>Photos et point d’avancement envoyés sur votre WhatsApp.</span></div>
+      <div><b>Un seul interlocuteur</b><span>Un responsable de chantier dédié, du premier jour à la remise des clés.</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="apropos bloc" id="apropos">
+  <span class="arc" style="width:440px;height:440px;border-width:60px;right:-170px;bottom:-150px" aria-hidden="true"></span>
+  <div class="wrap">
+    <div><span class="regle"></span><h2 class="revele">Bâtir avec sérieux, livrer avec rigueur.</h2></div>
+    <div class="texte revele">
+      <p>MCS accompagne particuliers, entreprises et investisseurs dans leurs projets de construction à Abidjan, de l’étude du terrain à la remise des clés.</p>
+      <p>Notre principe est simple : un délai annoncé est un délai tenu. C’est sur cette promesse que nos clients nous recommandent.</p>
+      <a class="btn btn-trait" href="a-propos.html" data-libelle="Voir">En savoir plus sur MCS<i class="fleche"></i></a>
+      <div class="valeurs">
+        <div><b>Qualité</b><span>Matériaux contrôlés et travail dans les règles de l’art.</span></div>
+        <div><b>Professionnalisme</b><span>Des équipes encadrées, un chantier propre et organisé.</span></div>
+        <div><b>Engagement</b><span>Une date de livraison écrite, et respectée.</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="fondu vers-nuit" aria-hidden="true"></div>
+<section class="chantier sombre" id="chantier" aria-labelledby="titre-chantier">
+  <div class="scene">
+    <div class="wrap">
+      <div>
+        <span class="regle"></span>
+        <h2 id="titre-chantier">Un planning tenu, étape après étape.</h2>
+        <ol class="phases" id="phases">
+          <li><span class="pastille">1</span><span><b>Fondations</b><span class="desc">Implantation, terrassement et semelles, selon l’étude de sol.</span></span></li>
+          <li><span class="pastille">2</span><span><b>Structure</b><span class="desc">Poteaux, poutres et dalles en béton armé.</span></span></li>
+          <li><span class="pastille">3</span><span><b>Maçonnerie</b><span class="desc">Élévation des murs, niveau par niveau.</span></span></li>
+          <li><span class="pastille">4</span><span><b>Toiture</b><span class="desc">Dalle de toiture, acrotère et étanchéité.</span></span></li>
+          <li><span class="pastille">5</span><span><b>Finitions</b><span class="desc">Menuiseries, enduits, peinture, électricité et aménagements.</span></span></li>
+          <li><span class="pastille">6</span><span><b>Remise des clés</b><span class="desc">Réception avec vous, à la date inscrite au contrat.</span></span></li>
+        </ol>
+      </div>
+      <div class="facade">
+        <div class="avance">Avancement <b id="pct">0 %</b></div>
+        <div class="livre" id="livre"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0C2D63" stroke-width="3" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>Livré à la date du contrat</div>
+        <svg viewBox="0 0 800 560" role="img" aria-label="Façade d’un bâtiment qui se construit étape par étape">
+          <defs>
+            <pattern id="hachure" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><path d="M0 0V10" stroke="rgba(185,226,246,.35)" stroke-width="2"/></pattern>
+            <pattern id="blocs" width="40" height="16" patternUnits="userSpaceOnUse"><path d="M0 16H40M0 8H40M20 0V8M0 8V16M40 8V16" stroke="rgba(124,200,239,.35)" stroke-width="1" fill="none"/></pattern>
+            <linearGradient id="verre" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#B9E2F6"/><stop offset="1" stop-color="#2C66B0"/></linearGradient>
+          </defs>
+          <rect x="0" y="470" width="800" height="70" fill="url(#hachure)"/>
+          <path d="M0 470H800" stroke="#7CC8EF" stroke-width="1.5"/>
+
+          <g class="grue" id="grue" stroke="#EDC23B" stroke-width="2" fill="none">
+            <path class="t" data-p="0" d="M720 470V70"/><path class="t" data-p="0" d="M708 470V70"/>
+            <path class="t" data-p="0" d="M708 440L720 410L708 380L720 350L708 320L720 290L708 260L720 230L708 200L720 170L708 140L720 110L708 80"/>
+            <path class="t" data-p="0" d="M760 70H330M330 70L714 40L760 70"/>
+            <path class="t" data-p="0" d="M420 70V150"/>
+          </g>
+
+          <g data-p="0">
+            <path class="t" d="M130 455H670V470H130Z" stroke="#B9E2F6" stroke-width="1.5" fill="none"/>
+            <path class="t" d="M145 470V502H195V470M285 470V502H335V470M425 470V502H475V470M565 470V502H615V470" stroke="#B9E2F6" stroke-width="1.5" fill="none"/>
+            <rect class="r" x="130" y="455" width="540" height="15" fill="url(#hachure)"/>
+          </g>
+
+          <g data-p="1" stroke="#7CC8EF" stroke-width="1.5" fill="none">
+            <path class="t" d="M163 455V200M177 455V200M303 455V200M317 455V200M443 455V200M457 455V200M583 455V200M597 455V200"/>
+            <path class="t" d="M140 330H660M140 344H660M140 200H660M140 214H660"/>
+            <path class="t" d="M140 200V344M660 200V344"/>
+          </g>
+          <g data-p="1" class="echafaudage" id="echaf" stroke="rgba(237,194,59,.75)" stroke-width="1.2" fill="none">
+            <path class="t" d="M110 470V180M690 470V180M110 400H130M110 330H130M110 260H130M110 190H130M670 400H690M670 330H690M670 260H690M670 190H690M110 400L130 330M670 260L690 190"/>
+          </g>
+
+          <g data-p="2">
+            <rect class="r" x="177" y="344" width="126" height="111" fill="url(#blocs)"/>
+            <rect class="r" x="317" y="344" width="126" height="111" fill="url(#blocs)"/>
+            <rect class="r" x="457" y="344" width="126" height="111" fill="url(#blocs)"/>
+            <rect class="r" x="177" y="214" width="126" height="116" fill="url(#blocs)"/>
+            <rect class="r" x="317" y="214" width="126" height="116" fill="url(#blocs)"/>
+            <rect class="r" x="457" y="214" width="126" height="116" fill="url(#blocs)"/>
+          </g>
+
+          <g data-p="3" stroke="#B9E2F6" stroke-width="1.5" fill="none">
+            <path class="t" d="M126 186H674V200H126Z"/>
+            <path class="t" d="M126 186V166H140V186M660 186V166H674V186M126 166H674"/>
+            <path class="t" d="M470 166V120H600V166"/>
+            <rect class="r" x="126" y="166" width="548" height="34" fill="rgba(185,226,246,.12)" stroke="none"/>
+          </g>
+
+          <g data-p="4">
+            <rect class="r" x="140" y="214" width="520" height="241" fill="#F4F8FC"/>
+            <rect class="r" x="140" y="200" width="520" height="14" fill="#0C2D63"/>
+            <rect class="r" x="140" y="330" width="520" height="14" fill="#0C2D63"/>
+            <rect class="r" x="126" y="166" width="548" height="34" fill="#0C2D63"/>
+            <rect class="r" x="470" y="120" width="130" height="46" fill="#DCE9F4"/>
+            <rect class="r" x="485" y="130" width="100" height="26" fill="url(#verre)"/>
+            <rect class="r" x="190" y="236" width="100" height="78" fill="url(#verre)"/>
+            <rect class="r" x="330" y="236" width="230" height="78" fill="url(#verre)"/>
+            <rect class="r" x="190" y="366" width="100" height="70" fill="url(#verre)"/>
+            <rect class="r" x="470" y="366" width="90" height="70" fill="url(#verre)"/>
+            <rect class="r" x="350" y="366" width="70" height="89" fill="#114B9D"/>
+            <rect class="r" x="330" y="352" width="110" height="8" fill="#EDC23B"/>
+            <path class="t" d="M330 296H560M330 288V314M375 288V314M420 288V314M465 288V314M510 288V314M560 288V314" stroke="#0C2D63" stroke-width="2.5" fill="none"/>
+            <path class="t" d="M445 236V314M240 236V314" stroke="#F4F8FC" stroke-width="3" fill="none"/>
+            <circle class="r" cx="320" cy="390" r="5" fill="#EDC23B"/><circle class="r" cx="450" cy="390" r="5" fill="#EDC23B"/>
+            <rect class="r" x="150" y="440" width="34" height="15" rx="7" fill="#2F7A4D"/><rect class="r" x="616" y="440" width="34" height="15" rx="7" fill="#2F7A4D"/>
+          </g>
+
+          <g data-p="5">
+            <circle class="r" cx="400" cy="92" r="30" fill="#EDC23B"/>
+            <path class="t" d="M386 92l10 10 18-20" stroke="#0C2D63" stroke-width="4" fill="none" stroke-linecap="round"/>
+          </g>
+        </svg>
+      </div>
+    </div>
+  </div>
+</section>
+<div class="fondu vers-brume" aria-hidden="true"></div>
+
+<section class="metiers bloc" id="metiers">
+  <span class="arc" style="width:400px;height:400px;border-width:52px;left:-210px;top:90px" aria-hidden="true"></span>
+  <div class="wrap">
+    <div class="entete-section"><div><span class="regle"></span><h2 class="revele">Nos métiers</h2></div><p class="revele">Un seul partenaire pour l’ensemble de votre projet, du terrain nu au bien prêt à habiter ou à vendre.</p></div>
+    <div class="liste-metiers">
+      <a class="metier" href="metiers.html" data-apercu="1" data-libelle="Voir"><span class="n">01</span><h3>Construction</h3><p>Villas, immeubles et bâtiments professionnels, livrés clés en main.</p><span class="rond"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0C2D63" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+      <a class="metier" href="metiers.html" data-apercu="2" data-libelle="Voir"><span class="n">02</span><h3>Gros œuvre</h3><p>Fondations, structure, maçonnerie et dalles, réalisées selon les normes.</p><span class="rond"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0C2D63" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+      <a class="metier" href="metiers.html" data-apercu="3" data-libelle="Voir"><span class="n">03</span><h3>Finition</h3><p>Finition partielle ou complète : enduits, carrelage, peinture, menuiserie, électricité.</p><span class="rond"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0C2D63" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+      <a class="metier" href="immobilier.html" data-apercu="4" data-libelle="Voir"><span class="n">04</span><h3>Immobilier</h3><p>Achat et vente de biens, avec un accompagnement de la visite à la signature.</p><span class="rond"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#0C2D63" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></a>
+    </div>
+  </div>
+</section>
+
+<section class="realisations bloc" id="realisations">
+  <span class="arc" style="width:380px;height:380px;border-width:50px;right:-180px;top:40px" aria-hidden="true"></span>
+  <div class="wrap">
+    <div class="entete-section"><div><span class="regle"></span><h2 class="revele">Réalisations</h2></div><p class="revele">Nos projets en images 3D et en plans. Faites glisser pour parcourir, cliquez pour découvrir un projet.</p></div>
+    <div class="piste-proj" id="piste" data-rendu="projets-piste" data-limite="9"></div>
+    <div class="commandes">
+      <button type="button" id="gauche" aria-label="Réalisation précédente"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M19 12H5M11 6l-6 6 6 6"/></svg></button>
+      <button type="button" id="droite" aria-label="Réalisation suivante"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></button>
+      <div class="jauge" aria-hidden="true"><i id="jauge"></i></div>
+      <a class="lien-tout" href="realisations.html">Toutes les réalisations</a>
+    </div>
+  </div>
+</section>
+
+<section class="decision">
+  <div class="wrap">
+    <div>
+      <h2 class="revele">Chaque mois de retard sur votre décision est un mois de plus avant la remise des clés.</h2>
+      <p class="revele">Plus tôt votre projet démarre, plus tôt vous recevez vos clés. Réservez dès maintenant votre date de démarrage : elle sera inscrite à votre planning et à votre contrat.</p>
+    </div>
+    <div class="actions-decision revele">
+      <a class="btn btn-bleu" href="contact.html#formulaire" data-libelle="Réserver">Réserver ma date de démarrage<i class="fleche"></i></a>
+      <a class="btn btn-trait" data-lien="whatsapp" href="contact.html#formulaire" data-libelle="WhatsApp">En parler sur WhatsApp</a>
+    </div>
+  </div>
+</section>
+
+<section class="actualites bloc" id="actualites">
+  <span class="arc" style="width:420px;height:420px;border-width:56px;left:-180px;bottom:-170px" aria-hidden="true"></span><span class="arc" style="width:220px;height:220px;border-width:30px;right:-90px;top:60px" aria-hidden="true"></span>
+  <div class="wrap">
+    <div class="entete-section"><div><span class="regle"></span><h2 class="revele">Actualités</h2></div><p class="revele">Avancement de nos chantiers, conseils pour bien construire et nouvelles de l’entreprise.</p></div>
+    <div class="grille-actu" data-rendu="articles" data-limite="3"></div>
+    <p style="margin:48px 0 0"><a class="lien-tout" href="actualites.html">Toutes les actualités</a></p>
+  </div>
+</section>
+
+<section class="contact bloc sombre" id="contact">
+  <span id="formulaire"></span>
+  <span class="arc" style="width:320px;height:320px;border-width:42px;right:6%;top:-200px" aria-hidden="true"></span>
+  <div class="wrap">
+    <div>
+      <span class="regle"></span>
+      <h2>Parlons de votre projet.</h2>
+      <div class="coord">
+        <div><small>Téléphone</small><a data-lien="tel" href="#formulaire"><span data-info="telephone">[Numéro]</span></a></div>
+        <div><small>WhatsApp</small><a data-lien="whatsapp" href="#formulaire"><span data-info="whatsappAffiche">[WhatsApp]</span></a></div>
+        <div data-si="email"><small>Email</small><a data-lien="email" href="#formulaire"><span data-info="email">[Adresse email]</span></a></div>
+        <div><small>Bureau</small><span data-info="adresse">[Adresse], Abidjan</span></div>
+        <div><small>Horaires</small><span class="horaires" data-info="horaires">[Horaires]</span></div>
+      </div>
+    </div>
+    <form class="form" id="form" novalidate data-sujet="Demande de devis depuis le site MCS">
+      <label>Nom complet<input name="nom" autocomplete="name" required></label>
+      <label>Téléphone ou WhatsApp<input name="tel" type="tel" autocomplete="tel" required></label>
+      <label>Type de projet<select name="projet"><option value="construction">Construction</option><option value="gros-oeuvre">Gros œuvre</option><option value="finition">Finition</option><option value="immobilier">Achat ou vente de bien</option></select></label>
+      <label>Livraison souhaitée<input name="date" type="month"></label>
+      <label class="plein">Votre projet en quelques mots<textarea name="message" placeholder="Terrain, surface, nombre de niveaux, budget envisagé"></textarea></label>
+      <div class="envoi plein"><button class="btn btn-jaune" type="submit" data-libelle="Envoyer">Envoyer votre message<i class="fleche"></i></button><span class="note">Réponse sous <span data-info="delaiReponse">48 h</span></span></div>
+      <p class="msg" aria-live="polite"></p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="colonnes">
+      <div><img class="logo-pied" src="assets/img/logo.png" alt="MCS"><p style="margin:0;max-width:300px"><span data-info="slogan">Construire aujourd’hui le meilleur de demain.</span> Qualité, professionnalisme, engagement.</p>
+        <div class="reseaux"><a data-reseau="facebook" href="#">Facebook</a><a data-reseau="instagram" href="#">Instagram</a><a data-reseau="linkedin" href="#">LinkedIn</a><a class="reseau-ico" data-reseau="tiktok" href="#" aria-label="MCS sur TikTok" title="TikTok"><img src="assets/img/tiktok.png" alt="TikTok" width="40" height="40"></a></div></div>
+      <div><h4>Entreprise</h4><ul><li><a href="a-propos.html">À propos</a></li><li><a href="realisations.html">Réalisations</a></li><li><a href="actualites.html">Actualités</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+      <div><h4>Nos métiers</h4><ul><li><a href="metiers.html">Construction</a></li><li><a href="metiers.html">Gros œuvre</a></li><li><a href="metiers.html">Finition</a></li><li><a href="immobilier.html">Immobilier</a></li></ul></div>
+      <div><h4>Contact</h4><ul><li>Tél. <a data-lien="tel" data-info="telephone" href="contact.html">[Numéro]</a></li><li>WhatsApp <a data-lien="whatsapp" data-info="whatsappAffiche" href="contact.html">[WhatsApp]</a></li><li data-si="email"><a data-lien="email" data-info="email" href="contact.html">[Adresse email]</a></li><li data-info="adresse">[Adresse], Abidjan</li><li class="horaires" data-info="horaires">[Horaires]</li></ul></div>
+    </div>
+    <div class="bas"><span>© <span class="annee">2026</span> MCS. Tous droits réservés.</span><span class="signature">Site créé par <a href="https://www.zematechnologies.com" target="_blank" rel="noopener">ZEMA TECHNOLOGIES</a></span></div>
+  </div>
+</footer>
+
+<a class="wa" data-lien="whatsapp" href="contact.html#formulaire" aria-label="Écrire à MCS sur WhatsApp" data-libelle="WhatsApp"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.7" aria-hidden="true"><path d="M4 20l1.4-4A8 8 0 1 1 8 18.6z"/><path d="M9 9.5c0 3 2.5 5.5 5.5 5.5l1-1.5-2-1-1 1c-1-.5-2-1.5-2.5-2.5l1-1-1-2z"/></svg></a>
+
+<script src="assets/js/donnees.js"></script>
+<script src="assets/js/store.js"></script>
+<script src="assets/js/main.js"></script>
+</body>
+</html>
