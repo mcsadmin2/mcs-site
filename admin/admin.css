@@ -188,3 +188,9 @@ input,select,textarea{font:inherit; color:var(--texte)}
   .carte{padding:16px}
   .haut h1{font-size:18px}
 }
+.succes{color:#1E7A46; font-size:13.5px; min-height:0; margin:0 0 10px}
+.succes:empty{display:none}
+.liens-connexion{display:flex; flex-direction:column; gap:8px; margin-top:18px; font-size:13.5px}
+.liens-connexion a{color:var(--bleu, #114B9D); text-decoration:none}
+.liens-connexion a:hover{text-decoration:underline}
+.chargement{padding:40px; text-align:center; color:var(--doux)}

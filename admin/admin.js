@@ -1,8 +1,6 @@
 /* =====================================================================
    MCS — Espace administrateur
-   Mode démonstration : données gardées dans ce navigateur (localStorage).
-   Quand Supabase sera branché, seule la couche « Stockage » ci-dessous
-   sera remplacée (base de données, fichiers, comptes).
+   Données, fichiers et comptes : Supabase (projet « MCS SITE WEB »).
    ===================================================================== */
 (function(){
   'use strict';
@@ -14,51 +12,152 @@
   var src = function(u){ return !u ? '' : (/^(data:|https?:|blob:|\.\.\/)/.test(u) ? u : '../' + u); };
   var dateFr = function(iso, heure){ if (!iso) return ''; var d = new Date(iso); return d.toLocaleDateString('fr-FR', { day: '2-digit', month: 'short', year: 'numeric' }) + (heure ? ' à ' + d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' }) : ''); };
 
-  /* =================== Stockage (mode démonstration) =================== */
-  var CLES = { donnees: 'mcs-donnees', demandes: 'mcs-demandes', stats: 'mcs-stats', comptes: 'mcs-comptes', session: 'mcs-session' };
+  /* =================== Stockage (Supabase) =================== */
+  var CFG = window.MCS_SUPABASE || {};
+  var sb = window.supabase.createClient(CFG.url, CFG.cle, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
   var CONTENUS = ['infos', 'diaporama', 'metiersPhotos', 'apropos', 'faq', 'chiffres', 'equipe', 'projets', 'biens', 'articles', 'ordreAccueil'];
   var BASE = clone(window.MCS || {});
-  function lire(cle, d){ try { var v = localStorage.getItem(cle); return v ? JSON.parse(v) : d; } catch(e){ return d; } }
-  function ecrire(cle, v){ try { localStorage.setItem(cle, JSON.stringify(v)); return true; } catch(e){ toast('Espace de stockage du navigateur plein : réduisez la taille des images. (Limite levée avec Supabase.)', true); return false; } }
-  var D = (function(){ var o = clone(BASE), s = lire(CLES.donnees, null); if (s) Object.keys(s).forEach(function(k){ o[k] = s[k]; }); return o; })();
-  if (!D.ordreAccueil) D.ordreAccueil = ['chantier-riviera-bonoumin', 'projet-01', 'chantier-angre-chateau'].concat((D.projets || []).map(function(p){ return p.id; }).filter(function(id){ return ['chantier-riviera-bonoumin', 'projet-01', 'chantier-angre-chateau'].indexOf(id) < 0; }));
-  function sauver(msg){ var o = {}; CONTENUS.forEach(function(k){ o[k] = D[k]; }); if (ecrire(CLES.donnees, o)) toast(msg || 'Enregistré — visible sur le site'); }
-  function demandes(){ return lire(CLES.demandes, []); }
-  function sauverDemandes(l){ ecrire(CLES.demandes, l); majPastilles(); }
+  var D = clone(BASE), DEM = [], STATS = [], PROFILS = [], INVITS = [];
+  var copieContenus = {};
+  function erreurReseau(e){ console.error(e); toast('Échec de l’enregistrement. Vérifiez votre connexion Internet et réessayez.', true); }
+  function chargerContenus(){
+    return sb.from('contenus').select('cle,valeur').then(function(r){
+      if (r.error) throw r.error;
+      D = clone(BASE);
+      (r.data || []).forEach(function(x){ D[x.cle] = x.valeur; copieContenus[x.cle] = JSON.stringify(x.valeur); });
+      if (!D.ordreAccueil) D.ordreAccueil = ['chantier-riviera-bonoumin', 'projet-01', 'chantier-angre-chateau'].concat((D.projets || []).map(function(p){ return p.id; }).filter(function(id){ return ['chantier-riviera-bonoumin', 'projet-01', 'chantier-angre-chateau'].indexOf(id) < 0; }));
+    });
+  }
+  // N'envoie que les rubriques modifiées
+  function sauver(msg){
+    var lignes = CONTENUS.filter(function(k){ return D[k] !== undefined && JSON.stringify(D[k]) !== copieContenus[k]; }).map(function(k){ return { cle: k, valeur: D[k], maj: new Date().toISOString() }; });
+    if (!lignes.length) { toast(msg || 'Enregistré — visible sur le site'); return Promise.resolve(); }
+    toast('Enregistrement…');
+    return sb.from('contenus').upsert(lignes).then(function(r){
+      if (r.error) return erreurReseau(r.error);
+      lignes.forEach(function(l){ copieContenus[l.cle] = JSON.stringify(l.valeur); });
+      toast(msg || 'Enregistré — visible sur le site');
+    });
+  }
+  function versDemande(x){ return { id: x.id, date: x.cree, type: x.type, nom: x.nom, tel: x.tel, champs: x.champs || {}, page: x.page, statut: x.statut, notes: x.notes }; }
+  function chargerDemandes(){
+    return sb.from('demandes').select('*').order('cree', { ascending: false }).limit(1000).then(function(r){ if (r.error) throw r.error; DEM = (r.data || []).map(versDemande); majPastilles(); });
+  }
+  function demandes(){ return DEM; }
+  function majDemande(id, champs){
+    DEM.forEach(function(d){ if (d.id === id) Object.keys(champs).forEach(function(k){ d[k] = champs[k]; }); }); majPastilles();
+    return sb.from('demandes').update(champs).eq('id', id).then(function(r){ if (r.error) erreurReseau(r.error); });
+  }
+  function supprimerDemande(id){
+    DEM = DEM.filter(function(d){ return d.id !== id; }); majPastilles();
+    return sb.from('demandes').delete().eq('id', id).then(function(r){ if (r.error) erreurReseau(r.error); });
+  }
+  function chargerStats(){
+    var depuis = new Date(Date.now() - 125 * 864e5).toISOString(), tout = [], pas = 1000;
+    function page(i){
+      return sb.from('visites').select('t,type,page,detail,v,src,app').gte('t', depuis).order('t').range(i, i + pas - 1).then(function(r){
+        if (r.error) throw r.error;
+        (r.data || []).forEach(function(e){ e.t = new Date(e.t).getTime(); tout.push(e); });
+        if (r.data && r.data.length === pas && i < 200000) return page(i + pas);
+      });
+    }
+    return page(0).then(function(){ STATS = tout; });
+  }
+  function chargerComptes(){
+    if (!moi || moi.role !== 'admin') return Promise.resolve();
+    return Promise.all([sb.from('profils').select('*').order('cree'), sb.from('invitations').select('*').order('cree')]).then(function(r){ PROFILS = r[0].data || []; INVITS = r[1].data || []; });
+  }
+
+  // Envoi d'un fichier dans le stockage, retourne son adresse publique
+  function envoyerFichier(blob, ext, dossier){
+    var chemin = (dossier || 'img') + '/' + new Date().toISOString().slice(0, 7) + '/' + uid('f') + '.' + ext;
+    return sb.storage.from('medias').upload(chemin, blob, { contentType: blob.type || undefined, cacheControl: '31536000', upsert: false }).then(function(r){
+      if (r.error) throw r.error;
+      return sb.storage.from('medias').getPublicUrl(chemin).data.publicUrl;
+    });
+  }
 
   /* =================== Comptes et connexion =================== */
-  function hacher(txt){
-    if (window.crypto && crypto.subtle && window.TextEncoder) return crypto.subtle.digest('SHA-256', new TextEncoder().encode('mcs::' + txt)).then(function(b){ return Array.prototype.map.call(new Uint8Array(b), function(x){ return ('0' + x.toString(16)).slice(-2); }).join(''); });
-    var h = 0; for (var i = 0; i < txt.length; i++) { h = (h * 31 + txt.charCodeAt(i)) | 0; } return Promise.resolve('x' + h);
+  var moi = null, modeConnexion = 'connexion';
+  var TEXTES = {
+    connexion: ['Connexion', 'Accès réservé à l’équipe MCS.', 'Se connecter'],
+    creation: ['Créer mon mot de passe', 'Pour un compte ajouté par un administrateur MCS. Un email de confirmation vous sera envoyé.', 'Créer mon accès'],
+    oubli: ['Mot de passe oublié', 'Indiquez votre adresse : vous recevrez un lien pour choisir un nouveau mot de passe.', 'Recevoir le lien'],
+    nouveau: ['Nouveau mot de passe', 'Choisissez votre nouveau mot de passe (8 caractères minimum).', 'Enregistrer le mot de passe']
+  };
+  function changerMode(m){
+    modeConnexion = m; var t = TEXTES[m];
+    $('#c-titre').textContent = t[0]; $('#c-intro').textContent = t[1]; $('#c-bouton').textContent = t[2];
+    $('#c-erreur').textContent = ''; $('#c-ok').textContent = '';
+    $('#z-email').hidden = m === 'nouveau'; $('#c-id').required = m !== 'nouveau';
+    $('#z-mdp').hidden = m === 'oubli'; $('#c-mdp').required = m !== 'oubli';
+    $('#z-mdp2').hidden = !(m === 'creation' || m === 'nouveau'); $('#c-mdp2').required = m === 'creation' || m === 'nouveau';
+    $('#c-mdp').autocomplete = m === 'connexion' ? 'current-password' : 'new-password';
+    $$('#c-liens a').forEach(function(a){ a.hidden = m === 'nouveau' || (m === 'connexion' ? a.dataset.mode === 'connexion' : a.dataset.mode !== 'connexion'); });
   }
-  function comptes(){ return lire(CLES.comptes, null); }
-  function initComptes(){
-    if (comptes()) return Promise.resolve();
-    return hacher('MCS2026').then(function(h){ ecrire(CLES.comptes, [{ id: uid('u'), nom: 'Administrateur', identifiant: 'admin', role: 'admin', hash: h, aChanger: true, cree: new Date().toISOString() }]); });
-  }
-  var moi = null;
-  function session(){ try { var id = sessionStorage.getItem(CLES.session); return (comptes() || []).filter(function(c){ return c.id === id; })[0] || null; } catch(e){ return null; } }
+  $$('#c-liens a').forEach(function(a){ a.onclick = function(e){ e.preventDefault(); changerMode(a.dataset.mode); }; });
+  var ADMIN_URL = location.origin + location.pathname;
 
   $('#form-connexion').addEventListener('submit', function(e){
     e.preventDefault();
-    var id = $('#c-id').value.trim().toLowerCase(), mdp = $('#c-mdp').value;
-    hacher(mdp).then(function(h){
-      var c = (comptes() || []).filter(function(x){ return x.identifiant.toLowerCase() === id && x.hash === h; })[0];
-      if (!c) { $('#c-erreur').textContent = 'Identifiant ou mot de passe incorrect.'; return; }
-      try { sessionStorage.setItem(CLES.session, c.id); } catch(err){}
-      demarrer();
-    });
+    var email = $('#c-id').value.trim().toLowerCase(), mdp = $('#c-mdp').value, mdp2 = $('#c-mdp2').value, err = $('#c-erreur'), ok = $('#c-ok'), bt = $('#c-bouton');
+    err.textContent = ''; ok.textContent = '';
+    if ((modeConnexion === 'creation' || modeConnexion === 'nouveau') && mdp !== mdp2) { err.textContent = 'Les deux mots de passe ne correspondent pas.'; return; }
+    bt.disabled = true;
+    var fin = function(){ bt.disabled = false; };
+    if (modeConnexion === 'connexion') {
+      sb.auth.signInWithPassword({ email: email, password: mdp }).then(function(r){
+        fin();
+        if (r.error) { err.textContent = /confirm/i.test(r.error.message) ? 'Adresse pas encore confirmée : ouvrez le lien reçu par email.' : 'Email ou mot de passe incorrect.'; return; }
+        demarrer();
+      });
+    } else if (modeConnexion === 'creation') {
+      sb.auth.signUp({ email: email, password: mdp, options: { emailRedirectTo: ADMIN_URL } }).then(function(r){
+        fin();
+        if (r.error) { err.textContent = /already|registered/i.test(r.error.message) ? 'Ce compte existe déjà : connectez-vous ou utilisez « Mot de passe oublié ».' : 'Impossible de créer le compte : ' + r.error.message; return; }
+        if (r.data && r.data.session) { demarrer(); return; }
+        ok.textContent = 'C’est presque fini : ouvrez l’email envoyé à ' + email + ' et cliquez sur le lien de confirmation.';
+      });
+    } else if (modeConnexion === 'oubli') {
+      sb.auth.resetPasswordForEmail(email, { redirectTo: ADMIN_URL }).then(function(r){
+        fin();
+        if (r.error) { err.textContent = 'Envoi impossible pour le moment, réessayez dans quelques minutes.'; return; }
+        ok.textContent = 'Si un compte existe pour ' + email + ', un lien vient de vous être envoyé par email.';
+      });
+    } else {
+      sb.auth.updateUser({ password: mdp }).then(function(r){
+        fin();
+        if (r.error) { err.textContent = 'Mot de passe refusé : ' + r.error.message; return; }
+        try { history.replaceState(null, '', location.pathname); } catch(x){}
+        changerMode('connexion'); demarrer();
+      });
+    }
   });
+  sb.auth.onAuthStateChange(function(ev){ if (ev === 'PASSWORD_RECOVERY') { $('#app').hidden = true; $('#connexion').hidden = false; changerMode('nouveau'); } });
 
+  function afficherConnexion(msg){
+    $('#app').hidden = true; $('#connexion').hidden = false;
+    if (msg) $('#c-erreur').textContent = msg;
+  }
   function demarrer(){
-    moi = session();
-    if (!moi) { $('#app').hidden = true; $('#connexion').hidden = false; var c = comptes() || []; $('#note-demo').hidden = !(c.length === 1 && c[0].aChanger); return; }
-    $('#connexion').hidden = true; $('#app').hidden = false;
-    $('#u-nom').textContent = moi.nom; $('#u-role').textContent = moi.role === 'admin' ? 'Administrateur' : 'Éditeur';
-    construireNav();
-    var h = (location.hash || '').slice(1);
-    aller(SECTIONS[h] ? h : 'tableau');
-    if (moi.aChanger) setTimeout(function(){ aller('compte'); toast('Pour votre sécurité, choisissez un nouveau mot de passe.'); }, 300);
+    if (modeConnexion === 'nouveau') return;
+    sb.auth.getSession().then(function(r){
+      var s = r.data && r.data.session;
+      if (!s) { moi = null; afficherConnexion(); return; }
+      return sb.from('profils').select('*').eq('id', s.user.id).maybeSingle().then(function(p){
+        var pr = p.data;
+        if (!pr || !pr.role) { sb.auth.signOut(); afficherConnexion('Ce compte n’a pas encore accès à l’administration. Demandez à un administrateur MCS de vous ajouter.'); return; }
+        moi = { id: pr.id, nom: pr.nom || pr.email, email: pr.email, identifiant: pr.email, role: pr.role };
+        $('#connexion').hidden = true; $('#app').hidden = false;
+        $('#u-nom').textContent = moi.nom; $('#u-role').textContent = moi.role === 'admin' ? 'Administrateur' : 'Éditeur';
+        $('#contenu').innerHTML = '<div class="chargement">Chargement des données…</div>';
+        return Promise.all([chargerContenus(), chargerDemandes(), chargerStats().catch(function(e){ console.error(e); }), chargerComptes()]).then(function(){
+          construireNav();
+          var h = (location.hash || '').slice(1);
+          aller(SECTIONS[h] ? h : 'tableau');
+        });
+      });
+    }).catch(function(e){ console.error(e); afficherConnexion('Connexion au serveur impossible. Vérifiez votre connexion Internet puis rechargez la page.'); });
   }
 
   /* =================== Navigation =================== */
@@ -98,7 +197,7 @@
     $('#nav').innerHTML = G.map(function(g){ return (g[0] ? '<div class="groupe">' + g[0] + '</div>' : '') + g[1].map(function(k){ return '<button type="button" data-aller="' + k + '">' + ic(k) + '<span>' + SECTIONS[k][0] + '</span>' + (k === 'demandes' ? '<span class="pastille" id="pastille-dem" hidden></span>' : '') + '</button>'; }).join(''); }).join('') +
       '<button type="button" id="deconnexion" style="margin-top:12px">' + ic('sortie') + '<span>Se déconnecter</span></button>';
     $$('#nav [data-aller]').forEach(function(b){ b.onclick = function(){ aller(b.dataset.aller); $('#app').classList.remove('menu-ouvert'); }; });
-    $('#deconnexion').onclick = function(){ try { sessionStorage.removeItem(CLES.session); } catch(e){} location.hash = ''; location.reload(); };
+    $('#deconnexion').onclick = function(){ sb.auth.signOut().then(function(){ location.hash = ''; location.reload(); }); };
     majPastilles();
   }
   function majPastilles(){ var n = demandes().filter(function(d){ return d.statut === 'nouvelle'; }).length, p = $('#pastille-dem'); if (p) { p.hidden = !n; p.textContent = n; } }
@@ -107,7 +206,7 @@
     courant = k; location.hash = k;
     $$('#nav [data-aller]').forEach(function(b){ b.classList.toggle('actif', b.dataset.aller === k); });
     $('#titre-page').textContent = SECTIONS[k][0];
-    var c = $('#contenu'); c.innerHTML = '<div class="bandeau-demo">' + ic('pages', 16) + '<div><b>Mode démonstration</b> — vos modifications sont enregistrées dans ce navigateur et s’affichent sur le site ouvert dans ce même navigateur. Elles seront visibles par tous dès la connexion à Supabase.</div></div><div id="vue"></div>';
+    var c = $('#contenu'); c.innerHTML = '<div id="vue"></div>';
     SECTIONS[k][1]($('#vue'));
     window.scrollTo(0, 0);
   }
@@ -158,10 +257,28 @@
       r.onload = function(){ var im = new Image(); im.onload = function(){
         var w = im.width, h = im.height, s = Math.min(1, (max || 1600) / Math.max(w, h)), c = document.createElement('canvas');
         c.width = Math.round(w * s); c.height = Math.round(h * s); var x = c.getContext('2d'); x.fillStyle = '#fff'; x.fillRect(0, 0, c.width, c.height); x.drawImage(im, 0, 0, c.width, c.height);
-        ok(c.toDataURL('image/jpeg', q || .82));
+        c.toBlob(function(b){ if (!b) return ko(new Error('image')); envoyerFichier(b, 'jpg', 'img').then(ok, ko); }, 'image/jpeg', q || .82);
       }; im.onerror = ko; im.src = r.result; };
       r.onerror = ko; r.readAsDataURL(file);
     });
+  }
+  // Vidéo : envoi du fichier + image d'aperçu tirée de la vidéo
+  function envoyerVideo(file){
+    if (file.size > 50 * 1024 * 1024) return Promise.reject(new Error('Vidéo trop lourde (50 Mo maximum) : ' + file.name));
+    var ext = (file.name.split('.').pop() || 'mp4').toLowerCase();
+    var affiche = new Promise(function(ok){
+      var v = document.createElement('video'), u = URL.createObjectURL(file), fini = false;
+      var stop = function(x){ if (fini) return; fini = true; URL.revokeObjectURL(u); ok(x); };
+      v.muted = true; v.playsInline = true; v.preload = 'auto'; v.src = u;
+      v.onloadeddata = function(){ try { v.currentTime = Math.min(1, (v.duration || 2) / 2); } catch(e){ stop(null); } };
+      v.onseeked = function(){
+        var s = Math.min(1, 1280 / Math.max(v.videoWidth, v.videoHeight)), c = document.createElement('canvas');
+        c.width = Math.round(v.videoWidth * s); c.height = Math.round(v.videoHeight * s); c.getContext('2d').drawImage(v, 0, 0, c.width, c.height);
+        c.toBlob(function(b){ if (!b) return stop(null); envoyerFichier(b, 'jpg', 'img').then(stop, function(){ stop(null); }); }, 'image/jpeg', .8);
+      };
+      v.onerror = function(){ stop(null); }; setTimeout(function(){ stop(null); }, 15000);
+    });
+    return Promise.all([envoyerFichier(file, ext, 'videos'), affiche]).then(function(r){ return { src: r[0], affiche: r[1] || '', titre: file.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ') }; });
   }
   function choisirFichiers(accept, multiple){
     return new Promise(function(ok){ var i = document.createElement('input'); i.type = 'file'; i.accept = accept; i.multiple = !!multiple; i.onchange = function(){ ok(Array.prototype.slice.call(i.files || [])); }; i.click(); });
@@ -177,7 +294,7 @@
           '<span class="num">' + (i + 1) + '</span>' + (estVideo ? '<span class="type">Vidéo</span>' : (opts.etiquette ? '<span class="type">' + esc(opts.etiquette) + '</span>' : '')) + '</div>' +
           '<input value="' + esc(m.titre || '') + '" placeholder="Légende (ex. La façade)" data-legende="' + i + '">' +
           '<div class="outils"><button type="button" data-g="' + i + '" title="Vers la gauche">‹</button><button type="button" data-d="' + i + '" title="Vers la droite">›</button><button type="button" class="sup" data-s="' + i + '" title="Supprimer">✕</button></div></div>';
-      }).join('') + '<div class="depot" tabindex="0"><b>+ Ajouter ' + (opts.video ? 'des photos' : 'des images') + '</b><span>Cliquez ou glissez vos fichiers ici</span>' + (opts.video ? '<span style="font-size:12px">Vidéos : envoi activé après la connexion à Supabase</span>' : '') + '</div></div>';
+      }).join('') + '<div class="depot" tabindex="0"><b>+ Ajouter ' + (opts.video ? 'des photos' : 'des images') + '</b><span>Cliquez ou glissez vos fichiers ici</span>' + '</div></div>';
       $$('[data-legende]', zone).forEach(function(inp){ inp.oninput = function(){ liste[+inp.dataset.legende].titre = inp.value; }; });
       $$('[data-g]', zone).forEach(function(b){ b.onclick = function(){ var i = +b.dataset.g; if (i > 0) { liste.splice(i - 1, 0, liste.splice(i, 1)[0]); rendre(); } }; });
       $$('[data-d]', zone).forEach(function(b){ b.onclick = function(){ var i = +b.dataset.d; if (i < liste.length - 1) { liste.splice(i + 1, 0, liste.splice(i, 1)[0]); rendre(); } }; });
@@ -198,17 +315,17 @@
     function ajouter(files){
       files = files.filter(function(f){ return /^image\//.test(f.type); });
       if (!files.length) return;
-      toast('Préparation des images…');
+      toast('Envoi des images…');
       Promise.all(files.map(function(f){ return Promise.all([lireImage(f, opts.max || 1600, .82), lireImage(f, 720, .78)]).then(function(r){ return { src: r[0], mini: r[1], titre: f.name.replace(/\.[^.]+$/, '').replace(/[-_]+/g, ' ') }; }); }))
         .then(function(items){ items.forEach(function(it){ liste.push(it); }); rendre(); toast(items.length + (items.length > 1 ? ' images ajoutées' : ' image ajoutée')); })
-        .catch(function(){ toast('Impossible de lire ce fichier.', true); });
+        .catch(function(e){ console.error(e); toast('Échec de l’envoi de l’image. Vérifiez votre connexion.', true); });
     }
     rendre();
   }
   function choisirImageUnique(zone, valeur, surChange, ratio){
     function rendre(){
       zone.innerHTML = '<div style="display:flex;gap:14px;align-items:center;flex-wrap:wrap"><div style="width:200px;aspect-ratio:' + (ratio || '16/10') + ';border-radius:12px;overflow:hidden;background:var(--brume);border:1px solid var(--trait)">' + (valeur ? '<img src="' + esc(src(valeur)) + '" style="width:100%;height:100%;object-fit:cover" alt="">' : '') + '</div><button type="button" class="btn btn-trait btn-petit">Remplacer l’image</button></div>';
-      $('button', zone).onclick = function(){ choisirFichiers('image/*').then(function(f){ if (!f[0]) return; lireImage(f[0], 1800, .84).then(function(u){ valeur = u; surChange(u); rendre(); }).catch(function(){ toast('Format non pris en charge.', true); }); }); };
+      $('button', zone).onclick = function(){ choisirFichiers('image/*').then(function(f){ if (!f[0]) return; lireImage(f[0], 1800, .84).then(function(u){ valeur = u; surChange(u); rendre(); }).catch(function(e){ console.error(e); toast('Échec de l’envoi de l’image (format ou connexion).', true); }); }); };
     }
     rendre();
   }
@@ -244,15 +361,15 @@
   function libProjet(p){ return { construction: 'Construction', 'gros-oeuvre': 'Gros œuvre', finition: 'Finition', immobilier: 'Achat ou vente de bien' }[p] || p; }
   function voirDemande(id, apres){
     var l = demandes(), d = l.filter(function(x){ return x.id === id; })[0]; if (!d) return;
-    if (d.statut === 'nouvelle') { d.statut = 'en-cours'; sauverDemandes(l); }
+    if (d.statut === 'nouvelle') majDemande(id, { statut: 'en-cours' });
     var C = d.champs || {}, lib = { nom: 'Nom', tel: 'Téléphone', projet: 'Type de projet', date: 'Livraison souhaitée', message: 'Message', dispo: 'Disponibilités', bien: 'Bien concerné' };
     var tel = (d.tel || '').replace(/[^\d+]/g, ''), wa = tel.replace(/\D/g, ''); if (wa.length === 10) wa = '225' + wa;
     var corps = '<div class="section-panneau"><h3>' + esc(d.type) + ' — ' + dateFr(d.date, true) + '</h3><dl class="dl">' + Object.keys(C).map(function(k){ return '<dt>' + esc(lib[k] || k) + '</dt><dd>' + esc(k === 'projet' ? libProjet(C[k]) : C[k]) + '</dd>'; }).join('') + '<dt>Page d’envoi</dt><dd>' + esc(d.page || '') + '</dd></dl></div>' +
       '<div class="section-panneau"><h3>Suivi</h3><div class="formu">' + champ({ k: 'statut', label: 'Statut', type: 'select', options: [['nouvelle', 'Nouvelle'], ['en-cours', 'En cours'], ['traitee', 'Traitée']] }, d.statut) + champ({ k: 'notes', label: 'Notes internes', type: 'textarea', ph: 'Ex. rappelé le 20/11, rendez-vous fixé…' }, d.notes) + '</div>' +
       '<div class="actions" style="margin-top:14px">' + (tel ? '<a class="btn btn-trait" href="tel:' + esc(tel) + '">Appeler</a><a class="btn btn-jaune" target="_blank" rel="noopener" href="https://wa.me/' + esc(wa) + '?text=' + encodeURIComponent('Bonjour ' + (d.nom || '') + ', ici MCS. Nous revenons vers vous suite à votre demande sur notre site.') + '">Répondre sur WhatsApp</a>' : '') + '</div></div>';
     var z = ouvrirPanneau('Demande de ' + (d.nom || ''), corps, [
-      { texte: 'Supprimer', classe: 'btn-danger', gauche: true, action: function(){ if (!confirmer('Supprimer définitivement cette demande ?')) return; sauverDemandes(demandes().filter(function(x){ return x.id !== id; })); fermerPanneau(); apres && apres(); toast('Demande supprimée'); } },
-      { texte: 'Enregistrer', classe: 'btn-bleu', action: function(){ var ll = demandes(), dd = ll.filter(function(x){ return x.id === id; })[0]; dd.statut = $('[data-k="statut"]', z).value; dd.notes = $('[data-k="notes"]', z).value; sauverDemandes(ll); fermerPanneau(); apres && apres(); toast('Demande mise à jour'); } }
+      { texte: 'Supprimer', classe: 'btn-danger', gauche: true, action: function(){ if (!confirmer('Supprimer définitivement cette demande ?')) return; supprimerDemande(id); fermerPanneau(); apres && apres(); toast('Demande supprimée'); } },
+      { texte: 'Enregistrer', classe: 'btn-bleu', action: function(){ majDemande(id, { statut: $('[data-k="statut"]', z).value, notes: $('[data-k="notes"]', z).value || null }); fermerPanneau(); apres && apres(); toast('Demande mise à jour'); } }
     ]);
     apres && apres();
   }
@@ -323,7 +440,13 @@
     if (estCh) {
       gestionMedias($('#z-photos', z), photos, {});
       var vz = $('#z-videos', z), vids = o.videos = o.videos || [];
-      var rv = function(){ vz.innerHTML = (vids.length ? '<div class="medias">' + vids.map(function(m, i){ return '<div class="media"><div class="apercu"><video src="' + esc(src(m.src)) + '" poster="' + esc(src(m.affiche || '')) + '" muted preload="metadata"></video><span class="num">' + (i + 1) + '</span><span class="type">Vidéo</span></div><input value="' + esc(m.titre || '') + '" data-vt="' + i + '" placeholder="Légende"><div class="outils"><button type="button" data-vg="' + i + '">‹</button><button type="button" data-vd="' + i + '">›</button><button type="button" class="sup" data-vs="' + i + '">✕</button></div></div>'; }).join('') + '</div>' : '<div class="vide" style="padding:20px">Aucune vidéo.</div>') + '<p class="sous" style="margin-top:10px">L’envoi de nouvelles vidéos sera activé avec Supabase (stockage des fichiers). En attendant, envoyez-les à ZEMA pour qu’elles soient ajoutées.</p>';
+      var rv = function(){ vz.innerHTML = (vids.length ? '<div class="medias">' + vids.map(function(m, i){ return '<div class="media"><div class="apercu"><video src="' + esc(src(m.src)) + '" poster="' + esc(src(m.affiche || '')) + '" muted preload="metadata"></video><span class="num">' + (i + 1) + '</span><span class="type">Vidéo</span></div><input value="' + esc(m.titre || '') + '" data-vt="' + i + '" placeholder="Légende"><div class="outils"><button type="button" data-vg="' + i + '">‹</button><button type="button" data-vd="' + i + '">›</button><button type="button" class="sup" data-vs="' + i + '">✕</button></div></div>'; }).join('') + '</div>' : '<div class="vide" style="padding:20px">Aucune vidéo.</div>') + '<button type="button" class="btn btn-trait btn-petit" data-vajout style="margin-top:12px">+ Ajouter des vidéos</button><p class="sous" style="margin-top:8px">Format MP4 conseillé, 50 Mo maximum par vidéo.</p>';
+        $('[data-vajout]', vz).onclick = function(){ choisirFichiers('video/*', true).then(function(files){
+          files = files.filter(function(f){ return /^video\//.test(f.type) || /\.(mp4|mov|webm|m4v)$/i.test(f.name); }); if (!files.length) return;
+          toast('Envoi de ' + files.length + ' vidéo(s)… gardez cette page ouverte.');
+          files.reduce(function(pr, f){ return pr.then(function(){ return envoyerVideo(f).then(function(it){ vids.push(it); rv(); }); }); }, Promise.resolve())
+            .then(function(){ toast('Vidéo(s) ajoutée(s) — pensez à enregistrer'); }).catch(function(e){ toast(e && e.message && /lourde/.test(e.message) ? e.message : 'Échec de l’envoi de la vidéo.', true); });
+        }); };
         $$('[data-vt]', vz).forEach(function(i){ i.oninput = function(){ vids[+i.dataset.vt].titre = i.value; }; });
         $$('[data-vg]', vz).forEach(function(b){ b.onclick = function(){ var i = +b.dataset.vg; if (i > 0) { vids.splice(i - 1, 0, vids.splice(i, 1)[0]); rv(); } }; });
         $$('[data-vd]', vz).forEach(function(b){ b.onclick = function(){ var i = +b.dataset.vd; if (i < vids.length - 1) { vids.splice(i + 1, 0, vids.splice(i, 1)[0]); rv(); } }; });
@@ -486,37 +609,15 @@
     ];
     v.innerHTML = '<div class="carte"><div class="tete-carte"><div><h2>Coordonnées de MCS</h2><p class="sous">Une modification ici s’applique partout sur le site (pied de page, page Contact, boutons WhatsApp…).</p></div><button class="btn btn-bleu" id="sv">Enregistrer</button></div>' +
       G.map(function(g){ return '<h3 style="font-size:15px;margin:18px 0 10px">' + g[0] + '</h3><div class="formu grille g2">' + g[1].map(function(d){ return champ(d, /^\[/.test(I[d.k] || '') ? '' : I[d.k]); }).join('') + '</div>'; }).join('') + '</div>' +
-      '<div class="carte"><div class="tete-carte"><div><h2>Sauvegarde des données</h2><p class="sous">Téléchargez une copie de tout le contenu du site (utile pour le transfert vers Supabase).</p></div></div><div class="actions"><button class="btn btn-trait" id="exp">Télécharger une sauvegarde</button><button class="btn btn-danger" id="rz">Revenir au contenu d’origine</button></div></div>';
+      '<div class="carte"><div class="tete-carte"><div><h2>Sauvegarde des données</h2><p class="sous">Téléchargez une copie de tout le contenu du site et des demandes reçues.</p></div></div><div class="actions"><button class="btn btn-trait" id="exp">Télécharger une sauvegarde</button><button class="btn btn-danger" id="rz">Revenir au contenu d’origine</button></div></div>';
     $('#sv', v).onclick = function(){ G.forEach(function(g){ lireChamps(v, g[1], I); }); sauver(); };
     $('#exp', v).onclick = function(){ var o = { exporte: new Date().toISOString(), contenus: {}, demandes: demandes() }; CONTENUS.forEach(function(k){ o.contenus[k] = D[k]; }); var b = new Blob([JSON.stringify(o, null, 2)], { type: 'application/json' }), a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = 'mcs-sauvegarde-' + new Date().toISOString().slice(0, 10) + '.json'; a.click(); };
-    $('#rz', v).onclick = function(){ if (!confirmer('Annuler toutes les modifications faites dans l’admin et revenir au contenu d’origine ? (Les demandes et comptes sont conservés.)')) return; try { localStorage.removeItem(CLES.donnees); } catch(e){} location.reload(); };
+    $('#rz', v).onclick = function(){ if (!confirmer('Annuler toutes les modifications faites dans l’admin et revenir au contenu d’origine ? (Les demandes, statistiques et comptes sont conservés.)')) return; sb.from('contenus').delete().neq('cle', '').then(function(r){ if (r.error) return erreurReseau(r.error); location.reload(); }); };
   }
 
   /* =================== 10. Statistiques =================== */
   var periodeStats = 30;
-  function evenements(){
-    var reels = lire(CLES.stats, []);
-    var visReels = {}; reels.forEach(function(e){ if (e.type === 'vue') visReels[e.v] = 1; });
-    if (Object.keys(visReels).length >= 20) return { l: reels, exemple: false };
-    // Données d'exemple (déterministes) en attendant la mise en ligne
-    var l = [], seed = 7, rnd = function(){ seed = (seed * 9301 + 49297) % 233280; return seed / 233280; };
-    var pages = [['index.html', 30], ['realisations.html', 18], ['projet.html?id=projet-01', 6], ['projet.html?id=chantier-riviera-bonoumin', 5], ['metiers.html', 8], ['bien.html', 6], ['immobilier.html', 7], ['a-propos.html', 7], ['contact.html', 9], ['actualites.html', 2]];
-    var srcs = [['Google', 34], ['Facebook', 26], ['WhatsApp', 18], ['Accès direct', 14], ['Instagram', 6], ['TikTok', 2]];
-    var pick = function(t){ var s = t.reduce(function(a, x){ return a + x[1]; }, 0), r = rnd() * s; for (var i = 0; i < t.length; i++) { r -= t[i][1]; if (r <= 0) return t[i][0]; } return t[0][0]; };
-    var now = Date.now();
-    for (var d = 59; d >= 0; d--) {
-      var nb = Math.round(14 + rnd() * 18 + (59 - d) * .35 + (new Date(now - d * 864e5).getDay() === 0 ? -6 : 0));
-      for (var k = 0; k < nb; k++) {
-        var v = 'ex' + d + '-' + k, t = now - d * 864e5 - rnd() * 864e5 * .9, s = pick(srcs), ap = rnd() < .78 ? 'Téléphone' : 'Ordinateur', np = 1 + Math.floor(rnd() * 4);
-        for (var p = 0; p < np; p++) l.push({ t: t + p * 6e4, type: 'vue', page: pick(pages), v: v, src: s, app: ap });
-        if (rnd() < .09) l.push({ t: t + 3e5, type: 'whatsapp', v: v, src: s, app: ap });
-        if (rnd() < .04) l.push({ t: t + 3e5, type: 'appel', v: v, src: s, app: ap });
-        if (rnd() < .03) l.push({ t: t + 3e5, type: 'demande', v: v, src: s, app: ap });
-        if (rnd() < .12) l.push({ t: t + 2e5, type: rnd() < .4 ? 'vue3d' : 'visionneuse', v: v, src: s, app: ap });
-      }
-    }
-    return { l: l.concat(reels), exemple: true };
-  }
+  function evenements(){ return { l: STATS, exemple: false }; }
   function statsCalc(jours){
     var E = evenements(), debut = Date.now() - jours * 864e5, prec = debut - jours * 864e5;
     var l = E.l.filter(function(e){ return e.t >= debut; }), lp = E.l.filter(function(e){ return e.t >= prec && e.t < debut; });
@@ -571,59 +672,62 @@
 
   /* =================== 11. Comptes =================== */
   function vueComptes(v){
-    var C = comptes() || [];
-    v.innerHTML = '<div class="carte"><div class="tete-carte"><div><h2>Comptes ayant accès à l’administration (' + C.length + ')</h2><p class="sous">Un administrateur gère tout, y compris les comptes. Un éditeur gère le contenu, les demandes et voit les statistiques.</p></div><button class="btn btn-bleu" data-nouveau-el>+ Nouveau compte</button></div>' +
-      '<table class="tableau"><thead><tr><th>Nom</th><th>Identifiant</th><th>Rôle</th><th>Créé le</th><th></th></tr></thead><tbody>' + C.map(function(c){ return '<tr><td><b>' + esc(c.nom) + '</b>' + (c.id === moi.id ? ' <span class="badge">Vous</span>' : '') + '</td><td>' + esc(c.identifiant) + '</td><td>' + (c.role === 'admin' ? '<span class="badge jaune">Administrateur</span>' : '<span class="badge">Éditeur</span>') + '</td><td>' + dateFr(c.cree) + '</td><td style="text-align:right"><button class="btn btn-trait btn-petit" data-modif="' + c.id + '">Modifier</button></td></tr>'; }).join('') + '</tbody></table></div>';
-    $('[data-nouveau-el]', v).onclick = function(){ editerCompte(null, function(){ vueComptes(v); }); };
-    $$('[data-modif]', v).forEach(function(b){ b.onclick = function(){ editerCompte(b.dataset.modif, function(){ vueComptes(v); }); }; });
+    var C = PROFILS.filter(function(c){ return c.role; }), I = INVITS;
+    v.innerHTML = '<div class="carte"><div class="tete-carte"><div><h2>Comptes ayant accès à l’administration (' + C.length + ')</h2><p class="sous">Un administrateur gère tout, y compris les comptes. Un éditeur gère le contenu, les demandes et voit les statistiques.</p></div><button class="btn btn-bleu" data-nouveau-el>+ Ajouter une personne</button></div>' +
+      '<table class="tableau"><thead><tr><th>Nom</th><th>Email</th><th>Rôle</th><th>Depuis le</th><th></th></tr></thead><tbody>' + C.map(function(c){ return '<tr><td><b>' + esc(c.nom) + '</b>' + (c.id === moi.id ? ' <span class="badge">Vous</span>' : '') + '</td><td>' + esc(c.email) + '</td><td>' + (c.role === 'admin' ? '<span class="badge jaune">Administrateur</span>' : '<span class="badge">Éditeur</span>') + '</td><td>' + dateFr(c.cree) + '</td><td style="text-align:right">' + (c.id !== moi.id ? '<button class="btn btn-trait btn-petit" data-modif="' + c.id + '">Modifier</button>' : '') + '</td></tr>'; }).join('') + '</tbody></table></div>' +
+      (I.length ? '<div class="carte"><div class="tete-carte"><div><h2>Accès en attente (' + I.length + ')</h2><p class="sous">Ces personnes doivent ouvrir la page de connexion et cliquer sur « Première connexion : créer mon mot de passe » avec leur adresse email.</p></div></div><table class="tableau"><thead><tr><th>Nom</th><th>Email</th><th>Rôle prévu</th><th></th></tr></thead><tbody>' + I.map(function(x){ return '<tr><td><b>' + esc(x.nom || '') + '</b></td><td>' + esc(x.email) + '</td><td>' + (x.role === 'admin' ? 'Administrateur' : 'Éditeur') + '</td><td style="text-align:right"><button class="btn btn-danger btn-petit" data-annuler="' + esc(x.email) + '">Annuler</button></td></tr>'; }).join('') + '</tbody></table></div>' : '');
+    var rafraichir = function(){ chargerComptes().then(function(){ vueComptes(v); }); };
+    $('[data-nouveau-el]', v).onclick = function(){ editerCompte(null, rafraichir); };
+    $$('[data-modif]', v).forEach(function(b){ b.onclick = function(){ editerCompte(b.dataset.modif, rafraichir); }; });
+    $$('[data-annuler]', v).forEach(function(b){ b.onclick = function(){ if (!confirmer('Annuler l’accès prévu pour ' + b.dataset.annuler + ' ?')) return; sb.from('invitations').delete().eq('email', b.dataset.annuler).then(function(r){ if (r.error) return erreurReseau(r.error); toast('Accès annulé'); rafraichir(); }); }; });
   }
   function editerCompte(id, apres){
-    var C = comptes() || [], o = id ? clone(C.filter(function(c){ return c.id === id; })[0]) : { id: uid('u'), nom: '', identifiant: '', role: 'editeur', cree: new Date().toISOString() };
-    var defs = [{ k: 'nom', label: 'Nom complet', ph: 'Ex. Laurent KODJO' }, { k: 'identifiant', label: 'Identifiant de connexion', ph: 'Ex. lkodjo' }, { k: 'role', label: 'Rôle', type: 'select', options: [['editeur', 'Éditeur'], ['admin', 'Administrateur']] }, { k: 'mdp', label: id ? 'Nouveau mot de passe (laisser vide pour ne pas changer)' : 'Mot de passe provisoire', type: 'text', ph: '8 caractères minimum', aide: 'La personne pourra le changer dans « Mon compte ».' }];
-    var z = ouvrirPanneau(id ? 'Modifier le compte' : 'Nouveau compte', '<div class="section-panneau"><div class="formu">' + defs.map(function(d){ return champ(d, d.k === 'mdp' ? '' : o[d.k]); }).join('') + '</div></div>', [
-      id && id !== moi.id ? { texte: 'Supprimer', classe: 'btn-danger', gauche: true, action: function(){ var admins = C.filter(function(c){ return c.role === 'admin'; }); if (o.role === 'admin' && admins.length < 2) { toast('Impossible : il doit rester au moins un administrateur.', true); return; } if (!confirmer('Supprimer le compte de ' + o.nom + ' ?')) return; ecrire(CLES.comptes, C.filter(function(c){ return c.id !== id; })); fermerPanneau(); apres(); toast('Compte supprimé'); } } : null,
+    var C = PROFILS.filter(function(c){ return c.role; }), o = id ? clone(C.filter(function(c){ return c.id === id; })[0]) : { nom: '', email: '', role: 'editeur' };
+    var defs = id ? [{ k: 'nom', label: 'Nom complet' }, { k: 'role', label: 'Rôle', type: 'select', options: [['editeur', 'Éditeur'], ['admin', 'Administrateur']] }]
+      : [{ k: 'nom', label: 'Nom complet', ph: 'Ex. Laurent KODJO' }, { k: 'email', label: 'Adresse email', ph: 'exemple@gmail.com', aide: 'La personne créera elle-même son mot de passe depuis la page de connexion (« Première connexion »).' }, { k: 'role', label: 'Rôle', type: 'select', options: [['editeur', 'Éditeur'], ['admin', 'Administrateur']] }];
+    var z = ouvrirPanneau(id ? 'Modifier le compte' : 'Ajouter une personne', '<div class="section-panneau"><div class="formu">' + defs.map(function(d){ return champ(d, o[d.k]); }).join('') + '</div>' + (id ? '<p class="sous" style="margin-top:12px">Email : ' + esc(o.email) + '</p>' : '') + '</div>', [
+      id ? { texte: 'Retirer l’accès', classe: 'btn-danger', gauche: true, action: function(){ if (!confirmer('Retirer l’accès à l’administration pour ' + o.nom + ' ?')) return; sb.from('profils').update({ role: null }).eq('id', id).then(function(r){ if (r.error) return erreurReseau(r.error); fermerPanneau(); apres(); toast('Accès retiré'); }); } } : null,
       { texte: 'Annuler', action: fermerPanneau },
       { texte: 'Enregistrer', classe: 'btn-bleu', action: function(){
         var f = lireChamps(z, defs, {});
-        if (!f.nom || !f.identifiant) { toast('Nom et identifiant obligatoires.', true); return; }
-        if (C.some(function(c){ return c.id !== o.id && c.identifiant.toLowerCase() === f.identifiant.toLowerCase(); })) { toast('Cet identifiant est déjà utilisé.', true); return; }
-        if (!id && f.mdp.length < 8) { toast('Mot de passe : 8 caractères minimum.', true); return; }
-        if (id && f.mdp && f.mdp.length < 8) { toast('Mot de passe : 8 caractères minimum.', true); return; }
-        if (o.role === 'admin' && f.role !== 'admin' && C.filter(function(c){ return c.role === 'admin'; }).length < 2) { toast('Il doit rester au moins un administrateur.', true); return; }
-        o.nom = f.nom; o.identifiant = f.identifiant; o.role = f.role;
-        (f.mdp ? hacher(f.mdp) : Promise.resolve(null)).then(function(h){
-          if (h) { o.hash = h; o.aChanger = o.id !== moi.id; }
-          var i = C.map(function(c){ return c.id; }).indexOf(o.id); if (i > -1) C[i] = o; else C.push(o);
-          ecrire(CLES.comptes, C); fermerPanneau(); apres(); toast(id ? 'Compte mis à jour' : 'Compte créé');
-        });
+        if (!f.nom) { toast('Le nom est obligatoire.', true); return; }
+        if (id) {
+          sb.from('profils').update({ nom: f.nom, role: f.role }).eq('id', id).then(function(r){ if (r.error) return erreurReseau(r.error); fermerPanneau(); apres(); toast('Compte mis à jour'); });
+        } else {
+          var em = (f.email || '').trim().toLowerCase();
+          if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)) { toast('Adresse email invalide.', true); return; }
+          if (PROFILS.some(function(p){ return (p.email || '').toLowerCase() === em && p.role; })) { toast('Cette personne a déjà accès.', true); return; }
+          var existant = PROFILS.filter(function(p){ return (p.email || '').toLowerCase() === em; })[0];
+          var op = existant ? sb.from('profils').update({ nom: f.nom, role: f.role }).eq('id', existant.id) : sb.from('invitations').upsert({ email: em, nom: f.nom, role: f.role });
+          op.then(function(r){ if (r.error) return erreurReseau(r.error); fermerPanneau(); apres(); toast(existant ? 'Accès donné' : 'Accès prévu : la personne peut maintenant créer son mot de passe'); });
+        }
       } }
     ].filter(Boolean));
   }
 
   /* =================== 12. Mon compte =================== */
   function vueCompte(v){
-    v.innerHTML = '<div class="grille g2"><div class="carte"><h2>Mes informations</h2><div class="formu" style="margin-top:16px">' + champ({ k: 'nom', label: 'Nom' }, moi.nom) + champ({ k: 'identifiant', label: 'Identifiant' }, moi.identifiant) + '</div><button class="btn btn-bleu" id="svi" style="margin-top:16px">Enregistrer</button></div>' +
-      '<div class="carte"><h2>Changer mon mot de passe</h2>' + (moi.aChanger ? '<p class="sous" style="color:var(--rouge)">Vous utilisez un mot de passe provisoire : choisissez-en un nouveau.</p>' : '') + '<form class="formu" style="margin-top:16px" id="fmdp">' + champ({ k: 'actuel', label: 'Mot de passe actuel', type: 'password' }) + champ({ k: 'n1', label: 'Nouveau mot de passe', type: 'password', aide: '8 caractères minimum.' }) + champ({ k: 'n2', label: 'Confirmer le nouveau mot de passe', type: 'password' }) + '<button class="btn btn-bleu" type="submit">Changer le mot de passe</button></form></div></div>';
+    v.innerHTML = '<div class="grille g2"><div class="carte"><h2>Mes informations</h2><div class="formu" style="margin-top:16px">' + champ({ k: 'nom', label: 'Nom' }, moi.nom) + '</div><p class="sous" style="margin-top:12px">Adresse de connexion : ' + esc(moi.email) + '</p><button class="btn btn-bleu" id="svi" style="margin-top:16px">Enregistrer</button></div>' +
+      '<div class="carte"><h2>Changer mon mot de passe</h2><form class="formu" style="margin-top:16px" id="fmdp">' + champ({ k: 'actuel', label: 'Mot de passe actuel', type: 'password' }) + champ({ k: 'n1', label: 'Nouveau mot de passe', type: 'password', aide: '8 caractères minimum.' }) + champ({ k: 'n2', label: 'Confirmer le nouveau mot de passe', type: 'password' }) + '<button class="btn btn-bleu" type="submit">Changer le mot de passe</button></form></div></div>';
     $('#svi', v).onclick = function(){
-      var C = comptes(), c = C.filter(function(x){ return x.id === moi.id; })[0], nom = $('[data-k="nom"]', v).value.trim(), idt = $('[data-k="identifiant"]', v).value.trim();
-      if (!nom || !idt) { toast('Champs obligatoires.', true); return; }
-      if (C.some(function(x){ return x.id !== moi.id && x.identifiant.toLowerCase() === idt.toLowerCase(); })) { toast('Identifiant déjà utilisé.', true); return; }
-      c.nom = nom; c.identifiant = idt; ecrire(CLES.comptes, C); moi = c; $('#u-nom').textContent = nom; toast('Informations mises à jour');
+      var nom = $('[data-k="nom"]', v).value.trim();
+      if (!nom) { toast('Le nom est obligatoire.', true); return; }
+      sb.from('profils').update({ nom: nom }).eq('id', moi.id).then(function(r){ if (r.error) return erreurReseau(r.error); moi.nom = nom; $('#u-nom').textContent = nom; toast('Informations mises à jour'); });
     };
     $('#fmdp', v).onsubmit = function(e){
       e.preventDefault();
       var a = $('[data-k="actuel"]', v).value, n1 = $('[data-k="n1"]', v).value, n2 = $('[data-k="n2"]', v).value;
       if (n1.length < 8) { toast('8 caractères minimum.', true); return; }
       if (n1 !== n2) { toast('Les deux mots de passe ne correspondent pas.', true); return; }
-      hacher(a).then(function(ha){
-        var C = comptes(), c = C.filter(function(x){ return x.id === moi.id; })[0];
-        if (ha !== c.hash) { toast('Mot de passe actuel incorrect.', true); return; }
-        return hacher(n1).then(function(hn){ c.hash = hn; c.aChanger = false; ecrire(CLES.comptes, C); moi = c; toast('Mot de passe changé'); vueCompte(v); });
+      sb.auth.signInWithPassword({ email: moi.email, password: a }).then(function(r){
+        if (r.error) { toast('Mot de passe actuel incorrect.', true); return; }
+        return sb.auth.updateUser({ password: n1 }).then(function(r2){ if (r2.error) { toast('Mot de passe refusé : ' + r2.error.message, true); return; } toast('Mot de passe changé'); vueCompte(v); });
       });
     };
   }
 
   /* =================== Démarrage =================== */
-  initComptes().then(demarrer);
-  window.addEventListener('storage', function(e){ if (e.key === CLES.demandes) { majPastilles(); if (courant === 'demandes' || courant === 'tableau') aller(courant); } });
+  changerMode('connexion');
+  demarrer();
+  setInterval(function(){ if (!moi) return; var avant = DEM.length; chargerDemandes().then(function(){ if (DEM.length !== avant && (courant === 'demandes' || courant === 'tableau') && $('#panneau').hidden) aller(courant); }).catch(function(){}); }, 60000);
 })();

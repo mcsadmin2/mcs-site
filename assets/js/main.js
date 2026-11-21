@@ -1,5 +1,6 @@
 /* MCS — comportements du site (toutes les pages) */
-(function(){
+window.MCSDemarrer = function(){
+  if (window.MCSDemarre) return; window.MCSDemarre = true;
   /* Toujours ouvrir une page en haut (sauf lien vers une ancre précise) */
   try { if ('scrollRestoration' in history) history.scrollRestoration = 'manual'; } catch(e){}
   function hautDePage(){
@@ -616,9 +617,18 @@
       var dem = { type: /visite/i.test(form.dataset.sujet || '') ? 'Visite de bien' : 'Demande de devis', champs: {} };
       $$('input, select, textarea', form).forEach(function(c){ if (c.name && c.value) dem.champs[c.name] = c.value; });
       dem.nom = dem.champs.nom || ''; dem.tel = dem.champs.tel || '';
-      try { if (window.MCSStore) window.MCSStore.enregistrerDemande(dem); } catch(err){}
-      msg.textContent = form.dataset.merci || ('Merci, votre message a bien été envoyé. Un responsable MCS vous recontacte sous ' + (I.delaiReponse || '48 h') + '.');
-      form.reset();
+      var bouton = $('button[type="submit"], button:not([type])', form), texteBouton = bouton ? bouton.textContent : '';
+      if (bouton) { bouton.disabled = true; bouton.textContent = 'Envoi en cours…'; }
+      msg.textContent = '';
+      var envoi;
+      try { envoi = window.MCSStore ? window.MCSStore.enregistrerDemande(dem) : Promise.reject(); } catch(err){ envoi = Promise.reject(err); }
+      Promise.resolve(envoi).then(function(){
+        msg.textContent = form.dataset.merci || ('Merci, votre message a bien été envoyé. Un responsable MCS vous recontacte sous ' + (I.delaiReponse || '48 h') + '.');
+        form.reset();
+      }, function(){
+        msg.innerHTML = 'L’envoi n’a pas abouti (connexion Internet ?). Réessayez, ou écrivez-nous directement sur <a href="https://wa.me/' + esc(I.whatsapp || '') + '" target="_blank" rel="noopener">WhatsApp</a>.';
+      }).then(function(){ if (bouton) { bouton.disabled = false; bouton.textContent = texteBouton; } });
     });
   });
-})();
+};
+(window.MCSPret || Promise.resolve()).then(function(){ window.MCSDemarrer(); }, function(){ window.MCSDemarrer(); });

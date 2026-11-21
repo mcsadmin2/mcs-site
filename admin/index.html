@@ -25,13 +25,19 @@
   </div>
   <div class="formulaire">
     <form class="carte-connexion" id="form-connexion" autocomplete="on">
-      <h2>Connexion</h2>
-      <p>Accès réservé à l’équipe MCS.</p>
-      <div class="champ"><label for="c-id">Identifiant</label><input id="c-id" name="identifiant" autocomplete="username" required></div>
-      <div class="champ"><label for="c-mdp">Mot de passe</label><input id="c-mdp" name="mdp" type="password" autocomplete="current-password" required></div>
+      <h2 id="c-titre">Connexion</h2>
+      <p id="c-intro">Accès réservé à l’équipe MCS.</p>
+      <div class="champ" id="z-email"><label for="c-id">Adresse email</label><input id="c-id" name="email" type="email" autocomplete="username" required></div>
+      <div class="champ" id="z-mdp"><label for="c-mdp">Mot de passe</label><input id="c-mdp" name="mdp" type="password" autocomplete="current-password" minlength="8" required></div>
+      <div class="champ" id="z-mdp2" hidden><label for="c-mdp2">Confirmer le mot de passe</label><input id="c-mdp2" name="mdp2" type="password" autocomplete="new-password" minlength="8"></div>
       <p class="erreur" id="c-erreur" aria-live="polite"></p>
-      <button class="btn btn-bleu" type="submit">Se connecter</button>
-      <div class="note-demo" id="note-demo"><b>Mode démonstration.</b> Premier accès : identifiant <b>admin</b>, mot de passe <b>MCS2026</b>. Il vous sera demandé de le changer.</div>
+      <p class="succes" id="c-ok" aria-live="polite"></p>
+      <button class="btn btn-bleu" type="submit" id="c-bouton">Se connecter</button>
+      <div class="liens-connexion" id="c-liens">
+        <a href="#" data-mode="creation">Première connexion : créer mon mot de passe</a>
+        <a href="#" data-mode="oubli">Mot de passe oublié ?</a>
+        <a href="#" data-mode="connexion" hidden>← Retour à la connexion</a>
+      </div>
     </form>
   </div>
 </div>
@@ -63,6 +69,8 @@
 <div class="toast" id="toast" role="status"></div>
 
 <script src="../assets/js/donnees.js"></script>
+<script src="supabase.js"></script>
+<script src="../assets/js/config.js"></script>
 <script src="admin.js"></script>
 </body>
 </html>
