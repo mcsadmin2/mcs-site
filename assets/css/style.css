@@ -882,3 +882,155 @@ footer .bas .signature{margin-left:auto}
 .carte-metier{cursor:default}
 .carte-metier:hover{transform:none; box-shadow:none}
 .carte-metier .corps{padding-bottom:30px}
+
+/* =====================================================================
+   VERSION MOBILE (téléphones uniquement) : mise en page plus compacte
+   ===================================================================== */
+@media (max-width:700px){
+  body{font-size:15.5px; line-height:1.55}
+  html{scroll-padding-top:calc(env(safe-area-inset-top,0px) + 72px)}
+  .wrap{padding:0 18px}
+  .regle{margin-bottom:16px; width:36px}
+
+  /* en-tête */
+  .entete .wrap{height:72px}
+  .marque img,.entete .marque img{width:46px; height:46px; border-radius:12px}
+  .burger{width:46px; height:46px}
+  .burger::before{top:16px} .burger span{top:22px} .burger::after{top:28px} .burger span,.burger::before,.burger::after{left:14px; right:14px}
+  .tiroir{padding-top:calc(env(safe-area-inset-top,0px) + 92px)}
+  .tiroir a{font-size:24px; padding:10px 0}
+
+  /* accueil : bandeau principal (le texte ne passe plus sous le logo) */
+  .hero{height:auto; min-height:0; max-height:none}
+  .hero .contenu{height:auto; min-height:min(100svh, 760px); justify-content:flex-end; padding-top:calc(env(safe-area-inset-top,0px) + 96px); padding-bottom:70px}
+  .hero .lieu{font-size:12.5px; gap:10px; margin-bottom:14px} .hero .lieu i{width:26px}
+  .hero h1{font-size:clamp(30px,8.6vw,38px); line-height:1.06}
+  .hero .chapo{font-size:15.5px; margin-top:14px; line-height:1.5}
+  .hero .actions{margin-top:22px; gap:10px}
+  .hero .actions .btn{min-height:48px; padding:0 22px; font-size:14.5px}
+  .hero .bas{bottom:22px}
+  .wa{width:52px; height:52px; right:16px; bottom:calc(16px + env(safe-area-inset-bottom,0px))}
+
+  /* sections : espacements réduits */
+  .bloc{padding:56px 0}
+  .bloc-s{padding:52px 0}
+  .fondu{height:64px}
+  .entete-section{gap:12px; margin-bottom:28px}
+  .entete-section h2,.apropos h2,.contact h2,.deux-col h2,.h2,.faq-grille h2,.decision h2{font-size:clamp(26px,7.4vw,32px); line-height:1.1}
+  .entete-section p,.deux-col .texte p,.apropos .texte p{font-size:15.5px}
+  .deux-col{gap:22px}
+
+  .engagements div{padding:22px 0 22px}
+  .engagements b{font-size:18px; margin-bottom:2px}
+  .engagements span{font-size:14.5px}
+
+  .apropos .wrap{gap:22px}
+  .apropos .texte p{margin-bottom:12px}
+  .valeurs{gap:10px; margin-top:22px}
+  .valeurs div{padding:16px 18px; border-radius:14px}
+  .valeurs div::before{margin-bottom:10px}
+  .valeurs b{font-size:17px}
+
+  /* planning épinglé : moins long à faire défiler */
+  .chantier{height:300vh}
+  .chantier .scene{padding-top:calc(env(safe-area-inset-top,0px) + 72px)}
+  .chantier h2{font-size:22px}
+
+  .metier{padding:20px 0; gap:6px}
+  .metier h3{font-size:24px}
+  .metier p{font-size:15px}
+  .metier .photo-metier{aspect-ratio:16/8; border-radius:14px}
+
+  .decision{padding:56px 0}
+  .decision .wrap{gap:24px}
+  .decision p{font-size:15.5px; margin-top:12px}
+  .decision::before{width:240px; height:240px; border-width:36px; right:-90px; top:-90px}
+
+  .contact.bloc{padding-top:120px}
+  .contact{background:linear-gradient(#FFFFFF 0px, var(--nuit) 110px, var(--nuit) 100%) !important}
+  .contact .wrap{gap:30px}
+  .contact .coord{margin-top:22px; gap:12px}
+  .contact .coord span{font-size:16px}
+  .form{gap:16px}
+  .form input,.form select,.form textarea{font-size:16px; min-height:42px; padding:8px 0 10px}
+  .form textarea{min-height:80px}
+
+  footer{padding-top:40px; font-size:14px}
+  footer .colonnes{gap:24px 18px; padding-top:28px}
+  footer .logo-pied{width:56px; height:56px; margin-bottom:12px}
+  footer h4{margin-bottom:10px; font-size:16px}
+  footer ul{gap:6px}
+  footer .bas{margin-top:30px; padding-top:18px}
+
+  /* pages intérieures : en-tête de page */
+  .page-hero{padding:calc(env(safe-area-inset-top,0px) + 96px) 0 44px}
+  .page-hero .wrap{gap:26px}
+  .fil{margin-bottom:14px; font-size:13px}
+  .page-hero h1{font-size:clamp(30px,8.4vw,38px); line-height:1.07}
+  .page-hero .chapo{font-size:15.5px; margin-top:14px}
+  .page-hero .actions{margin-top:20px; gap:10px}
+  .page-hero .actions .btn{min-height:48px; padding:0 20px; font-size:14.5px}
+  .page-hero .visuel{border-radius:18px}
+  .page-hero .meta-hero{margin-top:16px; font-size:14px}
+
+  /* blocs génériques */
+  .chiffres div{padding:20px 14px 6px 0}
+  .chiffres div + div{padding-left:14px}
+  .chiffres b{font-size:34px}
+  .chiffres b::after{margin:10px 0 8px}
+  .chiffres span{font-size:13.5px}
+  .etapes{gap:12px}
+  .etapes li{padding:20px 18px; border-radius:16px}
+  .etapes li::before{width:36px; height:36px; margin-bottom:12px}
+  .etapes b,.prestations b,.garanties b{font-size:18px; margin-bottom:4px}
+  .etapes span,.prestations span,.garanties span{font-size:14.5px}
+  .prestations div{padding:18px 0 20px}
+  .prestations div::before{margin-bottom:10px}
+  .garanties{gap:12px}
+  .garanties div{padding:20px 18px; border-radius:16px}
+  .garanties svg{margin-bottom:12px}
+  .cartes-metiers{gap:16px}
+  .carte-metier{border-radius:18px}
+
+  .faq summary{padding:16px 0; font-size:17px; gap:14px}
+  .faq summary::after{width:32px; height:32px; font-size:19px}
+  .faq details p{padding-bottom:16px; font-size:15px}
+  .faq-grille{gap:20px}
+
+  /* réalisations */
+  .liste-projets{gap:48px}
+  .bloc-projet{gap:18px}
+  .bloc-projet h3{font-size:24px}
+  .bloc-projet p{font-size:15px; margin-top:10px}
+  .bloc-projet .texte .haut{margin-bottom:10px}
+  .points{margin-top:12px; gap:6px} .points li{font-size:12.5px; padding:5px 10px}
+  .bloc-projet .actions{margin:18px 0 10px}
+  .vue-principale{border-radius:16px; box-shadow:0 16px 34px rgba(12,45,99,.14)}
+  .vignettes{gap:6px; margin-top:6px}
+  .vignette{border-radius:10px}
+  .grille-medias{gap:8px}
+  .proj .info{padding-top:12px}
+  .proj h3{font-size:20px}
+  .commandes{margin-top:18px}
+  .commandes button{width:46px; height:46px}
+
+  .aucune-actu{padding:32px 20px; border-radius:18px}
+  .aucune-actu .ico-actu{width:56px; height:56px; margin-bottom:12px}
+  .grille-actu,.grille-biens,.grille-proj{gap:20px}
+  .actu .meta{margin:12px 0 6px}
+  .actu h3{font-size:19px}
+
+  .fondateur{gap:22px}
+  .equipe{gap:14px}
+  .contact-rapide{gap:10px; grid-template-columns:1fr}
+  .contact-rapide a{display:grid; grid-template-columns:42px 1fr; column-gap:14px; row-gap:0; align-items:center; padding:14px 16px; border-radius:16px}
+  .contact-rapide .ico{width:42px; height:42px; margin:0; grid-row:span 2}
+  .contact-rapide small{font-size:13px}
+  .contact-rapide b{font-size:18px; line-height:1.2}
+  .vignettes{grid-template-columns:repeat(4,minmax(0,1fr))}
+  .bloc-projet .actions{gap:8px}
+  .bloc-projet .actions .btn{min-height:44px; font-size:14px}
+  footer .colonnes > :first-child,footer .colonnes > :last-child{grid-column:1 / -1}
+  footer .colonnes > :first-child{display:grid; grid-template-columns:auto 1fr; column-gap:14px; align-items:center}
+  footer .colonnes > :first-child .logo-pied{margin-bottom:0; grid-row:span 2}
+}
