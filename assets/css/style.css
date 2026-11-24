@@ -1031,6 +1031,31 @@ footer .bas .signature{margin-left:auto}
   .bloc-projet .actions{gap:8px}
   .bloc-projet .actions .btn{min-height:44px; font-size:14px}
   footer .colonnes > :first-child,footer .colonnes > :last-child{grid-column:1 / -1}
-  footer .colonnes > :first-child{display:grid; grid-template-columns:auto 1fr; column-gap:14px; align-items:center}
-  footer .colonnes > :first-child .logo-pied{margin-bottom:0; grid-row:span 2}
+  footer .colonnes > :first-child{display:flex; align-items:center; gap:14px}
+  footer .colonnes > :first-child .logo-pied{margin:0; flex:none}
+  footer .reseaux{margin-top:14px}
+  footer .bas{flex-direction:column; align-items:center; text-align:center; gap:6px; padding-bottom:calc(88px + env(safe-area-inset-bottom,0px))}
+  footer .bas span{text-align:center}
+  footer .bas .signature{margin-left:0}
+
+  /* accueil : bandeau sans grand vide au-dessus du titre */
+  .hero .contenu{min-height:0; justify-content:flex-start; padding-top:calc(env(safe-area-inset-top,0px) + 104px); padding-bottom:64px}
+  .voile{background:linear-gradient(to bottom, rgba(12,45,99,.55) 0%, rgba(12,45,99,.66) 50%, rgba(12,45,99,.8) 100%)}
 }
+
+/* Diaporama : chaque image (y compris la première) zoome doucement */
+.slide img{transform:scale(1); transition:none}
+.slide.active img{animation:zoom-lent 7s linear forwards}
+@keyframes zoom-lent{from{transform:scale(1.12)} to{transform:scale(1)}}
+@media (prefers-reduced-motion: reduce){ .slide.active img{animation:none} }
+/* voile bleu plus léger pour mieux voir les photos */
+.voile{background:linear-gradient(90deg, rgba(12,45,99,.82) 0%, rgba(12,45,99,.55) 34%, rgba(12,45,99,.10) 64%, rgba(12,45,99,0) 80%), linear-gradient(to top, rgba(12,45,99,.6) 0%, rgba(12,45,99,0) 34%)}
+@media (max-width:960px) and (min-width:701px){ .voile{background:linear-gradient(to top, rgba(12,45,99,.85) 0%, rgba(12,45,99,.55) 55%, rgba(12,45,99,.2) 100%)} }
+.hero h1,.hero .chapo,.hero .lieu{text-shadow:0 2px 14px rgba(8,26,58,.45)}
+
+/* invitation à utiliser le formulaire (à la place des coordonnées) */
+.invite-form{margin:22px 0 0; max-width:440px; color:#D6E6F5; font-size:17px; padding-left:16px; border-left:3px solid var(--jaune)}
+@media (max-width:700px){ .invite-form{font-size:15.5px; margin-top:14px} }
+
+/* accueil : titres de section en jaune, bien visibles */
+[data-page="accueil"] main section > .wrap h2,[data-page="accueil"] .chantier h2,[data-page="accueil"] .decision h2{color:var(--jaune); font-weight:700; letter-spacing:-.02em}
