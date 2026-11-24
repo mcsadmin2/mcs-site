@@ -1059,3 +1059,5 @@ footer .bas .signature{margin-left:auto}
 
 /* accueil : titres de section en jaune, bien visibles */
 [data-page="accueil"] main section > .wrap h2,[data-page="accueil"] .chantier h2,[data-page="accueil"] .decision h2{color:var(--jaune); font-weight:700; letter-spacing:-.02em}
+
+@media (max-width:700px){ .photo-equipe::after{display:none} }

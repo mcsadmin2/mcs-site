@@ -390,6 +390,12 @@ window.MCSDemarrer = function(){
   /* ---------------- Slider du hero (accueil) ---------------- */
   var slides = $$('.slide'), puces = $$('#puces button'), legendes = $$('.legende');
   var idx = 0, duree = 5500, t0 = 0, lance = false;
+  /* Sur téléphone, le diaporama commence par la 2e image */
+  if (slides.length > 1 && matchMedia('(max-width:700px)').matches) {
+    slides[0].classList.remove('active'); slides[1].classList.add('active'); idx = 1;
+    puces.forEach(function(p, k){ p.classList.toggle('fait', k < 1); p.classList.toggle('courant', k === 1); var b = $('i', p); if (b) b.style.width = k < 1 ? '100%' : '0'; });
+    legendes.forEach(function(l, k){ l.classList.toggle('active', k === 1); });
+  }
   function aller(i){
     var ancien = slides[idx];
     ancien.classList.remove('active'); ancien.classList.add('sortie');
