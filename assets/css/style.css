@@ -1061,3 +1061,30 @@ footer .bas .signature{margin-left:auto}
 [data-page="accueil"] main section > .wrap h2,[data-page="accueil"] .chantier h2,[data-page="accueil"] .decision h2{color:var(--jaune); font-weight:700; letter-spacing:-.02em}
 
 @media (max-width:700px){ .photo-equipe::after{display:none} }
+
+/* Chantier : tuile « évolution » et frise de l'évolution (fiche) */
+.tuile-evolution .cadre-video{display:block; color:#fff}
+.tuile-evolution img{filter:brightness(.55)}
+.voile-evo{position:absolute; inset:0; z-index:2; display:flex; flex-direction:column; justify-content:flex-end; gap:6px; padding:18px; background:linear-gradient(to top, rgba(12,45,99,.85), rgba(12,45,99,.15) 70%)}
+.voile-evo b{font-family:"Inter Tight", Arial, sans-serif; font-weight:600; font-size:24px; color:var(--jaune); line-height:1}
+.voile-evo span{font-size:14px; line-height:1.35}
+.voile-evo i{font-style:normal; font-weight:600; font-size:14px; margin-top:4px}
+.tuile-evolution:hover img{transform:scale(1.04)}
+.bloc-evolution{margin-top:48px; scroll-margin-top:110px}
+.bloc-evolution h2{margin-bottom:8px}
+.intro-evo{color:var(--doux); margin:0 0 22px}
+.frise-evo{list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:18px}
+.frise-evo li{margin:0}
+.frise-evo button{position:relative; display:block; width:100%; padding:0; border:0; border-radius:16px; overflow:hidden; aspect-ratio:4/5; background:var(--brume); cursor:zoom-in}
+.frise-evo img{position:absolute; inset:0; width:100%; height:100%; object-fit:cover; transition:transform .6s cubic-bezier(.2,.8,.2,1)}
+.frise-evo button:hover img{transform:scale(1.05)}
+.etape-evo{position:absolute; left:10px; top:10px; width:30px; height:30px; border-radius:50%; background:var(--jaune); color:var(--nuit); font-weight:700; font-size:13px; display:flex; align-items:center; justify-content:center}
+.frise-evo b{display:block; margin-top:8px; font-family:"Inter Tight", Arial, sans-serif; font-weight:500; font-size:15.5px; color:var(--nuit); line-height:1.25}
+@media (max-width:1000px){ .frise-evo{grid-template-columns:repeat(3,minmax(0,1fr))} }
+@media (max-width:700px){
+  .frise-evo{grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px}
+  .frise-evo button{border-radius:12px}
+  .frise-evo b{font-size:14px; margin-top:6px}
+  .voile-evo{padding:12px; gap:4px} .voile-evo b{font-size:19px} .voile-evo span{font-size:12.5px} .voile-evo i{font-size:12.5px}
+  .bloc-evolution{margin-top:32px}
+}

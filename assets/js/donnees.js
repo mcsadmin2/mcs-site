@@ -328,6 +328,32 @@ window.MCS = {
       photos: [],
       videos: [
         { src: "assets/video/angre-chateau-1.mp4", affiche: "assets/video/angre-chateau-1.jpg", titre: "La façade" }
+      ] },
+    { id: "chantier-angre-belle-cote", type: "Immeuble", titre: "Immeuble résidentiel — Angré Belle Côte", metier: "construction", lieu: "Cocody, Angré Belle Côte", annee: "[Année]", surface: "[X] m²", prevu: "[X] mois", reel: "[X] mois", statut: "en-cours", illustration: "immeuble", image: "assets/img/projets/angre-belle-cote-3d-min.jpg", galerie: [],
+      resume: "Un immeuble de standing à balcons arrondis, en cours de construction à Angré Belle Côte : la structure s’élève étage après étage.",
+      description: ["MCS construit cet immeuble résidentiel à Angré Belle Côte, dans la commune de Cocody. Le projet fini se distingue par ses balcons arrondis aux garde-corps vitrés, ses habillages bois et son éclairage d’ambiance.", "Le chantier a démarré par le terrassement et les fondations ; le gros œuvre monte aujourd’hui dans les étages. Chaque étape est réalisée avec la même exigence de qualité et de rigueur qui fait la signature de MCS."],
+      photos: [
+        { src: "assets/img/projets/angre-belle-cote-3d.jpg", titre: "Le projet fini (vue 3D)" },
+        { src: "assets/img/projets/angre-belle-cote.jpg", titre: "Le chantier aujourd’hui" }
+      ],
+      videos: [
+        { src: "assets/video/angre-belle-cote-1.mp4", affiche: "assets/video/angre-belle-cote-1.jpg", titre: "La dalle d’étage" }
+      ],
+      evolution: [
+        { src: "assets/img/projets/angre-belle-cote-01.jpg", mini: "assets/img/projets/angre-belle-cote-01-min.jpg", titre: "Terrassement du terrain" },
+        { src: "assets/img/projets/angre-belle-cote-02.jpg", mini: "assets/img/projets/angre-belle-cote-02-min.jpg", titre: "Implantation de l’ouvrage" },
+        { src: "assets/img/projets/angre-belle-cote-03.jpg", mini: "assets/img/projets/angre-belle-cote-03-min.jpg", titre: "Ferraillage des fondations" },
+        { src: "assets/img/projets/angre-belle-cote-04.jpg", mini: "assets/img/projets/angre-belle-cote-04-min.jpg", titre: "Ferraillage du radier" },
+        { src: "assets/img/projets/angre-belle-cote-05.jpg", mini: "assets/img/projets/angre-belle-cote-05-min.jpg", titre: "Mur de soutènement" },
+        { src: "assets/img/projets/angre-belle-cote-06.jpg", mini: "assets/img/projets/angre-belle-cote-06-min.jpg", titre: "Armatures des poteaux" },
+        { src: "assets/img/projets/angre-belle-cote-07.jpg", mini: "assets/img/projets/angre-belle-cote-07-min.jpg", titre: "Poteaux coulés et étaiement" },
+        { src: "assets/img/projets/angre-belle-cote-08.jpg", mini: "assets/img/projets/angre-belle-cote-08-min.jpg", titre: "Coffrage de la dalle" },
+        { src: "assets/img/projets/angre-belle-cote-09.jpg", mini: "assets/img/projets/angre-belle-cote-09-min.jpg", titre: "Coffrage et ferraillage des poutres" },
+        { src: "assets/img/projets/angre-belle-cote-10.jpg", mini: "assets/img/projets/angre-belle-cote-10-min.jpg", titre: "Pose des hourdis" },
+        { src: "assets/img/projets/angre-belle-cote-11.jpg", mini: "assets/img/projets/angre-belle-cote-11-min.jpg", titre: "Ferraillage de la dalle" },
+        { src: "assets/img/projets/angre-belle-cote-12.jpg", mini: "assets/img/projets/angre-belle-cote-12-min.jpg", titre: "Dalle d’étage en préparation" },
+        { src: "assets/img/projets/angre-belle-cote-13.jpg", mini: "assets/img/projets/angre-belle-cote-13-min.jpg", titre: "Hourdis et chaînages de l’étage" },
+        { src: "assets/img/projets/angre-belle-cote-14.jpg", mini: "assets/img/projets/angre-belle-cote-14-min.jpg", titre: "Élévation des étages" }
       ] }
   ],
 

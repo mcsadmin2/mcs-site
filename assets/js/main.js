@@ -145,7 +145,7 @@ window.MCSDemarrer = function(){
       visuels = '<button type="button" class="vue-principale" data-ouvrir="' + esc(p.id) + '|' + lp + '|0" data-libelle="Agrandir" aria-label="Agrandir l’image du projet"><img src="' + esc(principal.src) + '" alt="' + esc(p.titre + ' : ' + (principal.titre || '')) + '" loading="lazy"><span class="badge">Image 3D</span><span class="agrandir" aria-hidden="true"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/></svg></span></button>' +
         (vig.length ? '<div class="vignettes">' + vig.join('') + '</div>' : '');
     } else {
-      var m = mediasDe(p);
+      var m = mediasDe(p); if (p.evolution && p.evolution.length) m.push(tuileEvolution(p));
       visuels = m.length ? '<div class="grille-medias">' + m.join('') + '</div>' : '<a class="vue-principale" href="projet.html?id=' + esc(p.id) + '">' + media(p) + '</a>';
     }
     var points = (p.points || []).map(function(x){ return '<li>' + esc(x) + '</li>'; }).join('');
@@ -179,8 +179,13 @@ window.MCSDemarrer = function(){
     (p.videos || []).forEach(function(v){ out.push('<figure class="media-chantier video-chantier"><div class="cadre-video"><video src="' + esc(v.src) + '" poster="' + esc(v.affiche || '') + '" muted loop playsinline preload="metadata" aria-label="' + esc(p.titre + ' : ' + (v.titre || 'vidéo')) + '"></video>' + IC_LECTURE + (v.titre ? '<span class="piece">' + esc(v.titre) + '</span>' : '') + '<span class="type-media">Vidéo</span></div></figure>'); });
     return out;
   }
+  // Tuile qui mène à l'évolution complète du chantier (fiche)
+  function tuileEvolution(p){
+    var ev = p.evolution || []; if (!ev.length) return '';
+    return '<figure class="media-chantier tuile-evolution"><a class="cadre-video" href="projet.html?id=' + esc(p.id) + '#evolution" data-libelle="Voir"><img src="' + esc(ev[0].mini || ev[0].src) + '" alt="" loading="lazy"><span class="voile-evo"><b>' + ev.length + ' photos</b><span>L’évolution du chantier, de la base à aujourd’hui</span><i>Voir →</i></span></a></figure>';
+  }
   function groupeChantier(p){
-    var m = mediasDe(p);
+    var m = mediasDe(p); if (p.evolution && p.evolution.length) m.push(tuileEvolution(p));
     if (!m.length && p.image) m = ['<figure class="media-chantier"><div class="cadre-video"><img src="' + esc(p.image) + '" alt="' + esc(p.titre) + '" loading="lazy"></div></figure>'];
     return '<article class="groupe-chantier revele"><div class="tete-groupe"><div><span class="sur-titre"><span class="badge en-cours">Chantier en cours</span>' + esc(METIERS[p.metier] || '') + '</span><h3>' + esc(p.titre) + '</h3><span class="lieu">' + esc(p.lieu) + '</span></div><a class="lien-tout" href="projet.html?id=' + esc(p.id) + '">Voir le chantier</a></div>' +
       (m.length ? '<div class="grille-medias">' + m.join('') + '</div>' : '<a href="projet.html?id=' + esc(p.id) + '">' + carteProjet(p, 'div') + '</a>') + '</article>';
@@ -286,6 +291,16 @@ window.MCSDemarrer = function(){
       $$('.meta-hero').forEach(function(m){ $$('span', m).forEach(function(x){ if (!x.textContent.trim() || /Année\s*$/.test(x.textContent.trim())) x.remove(); }); });
       var zv = $('[data-rendu-videos]');
       if (zv) { var mm = mediasDe(o); if (mm.length) zv.querySelector('.grille-medias').innerHTML = mm.join(''); else zv.remove(); }
+      var ev = o.evolution || [];
+      if (ev.length) {
+        var sec = document.createElement('div'); sec.className = 'bloc-evolution'; sec.id = 'evolution';
+        sec.innerHTML = '<h2>L’évolution du chantier</h2><p class="intro-evo">De la base à aujourd’hui, étape par étape. Touchez une photo pour l’agrandir.</p><ol class="frise-evo">' +
+          ev.map(function(m, i){ return '<li><button type="button" data-ouvrir="' + esc(o.id) + '|evolution|' + i + '" data-libelle="Agrandir" aria-label="Agrandir : ' + esc(m.titre || '') + '"><img src="' + esc(m.mini || m.src) + '" alt="' + esc(o.titre + ' : ' + (m.titre || '')) + '" loading="lazy"><span class="etape-evo">' + (i + 1) + '</span></button><b>' + esc(m.titre || '') + '</b></li>'; }).join('') + '</ol>';
+        var apres = $('[data-rendu-videos]') || $('.fiche-medias:last-of-type');
+        if (apres && apres.parentNode) apres.parentNode.insertBefore(sec, apres.nextSibling);
+        else { var cible = $('.fiche > div') || $('main'); if (cible) cible.appendChild(sec); }
+        if (location.hash === '#evolution') setTimeout(function(){ sec.scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 700);
+      }
       var sim = $('[data-rendu-similaires]');
       if (sim) { var l = projets.filter(function(p){ return p.id !== o.id; }).slice(0, 3); sim.innerHTML = l.map(function(p){ return carteProjet(p); }).join(''); }
     }
@@ -554,7 +569,7 @@ window.MCSDemarrer = function(){
     function ouvrir(id, l, i, relief){
       var p = projets.filter(function(x){ return x.id === id; })[0]; if (!p) return;
       if (!vz) construire();
-      etat.p = p; $('.vz-num', vz).textContent = p.numero ? 'Projet ' + p.numero : 'Projet'; $('.vz-titre', vz).textContent = p.titre;
+      etat.p = p; $('.vz-num', vz).textContent = p.numero ? 'Projet ' + p.numero : (p.statut === 'en-cours' ? 'Chantier' : 'Projet'); $('.vz-titre', vz).textContent = p.titre;
       vz.hidden = false; document.body.classList.add('vz-ouverte');
       requestAnimationFrame(function(){ vz.classList.add('ouverte'); });
       etat.relief = false; basculerRelief(!!relief);
