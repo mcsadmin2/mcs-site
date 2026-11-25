@@ -192,7 +192,7 @@ window.MCSDemarrer = function(){
   }
 
   // Ordre des réalisations sur l'accueil : les identifiants listés passent en premier, dans cet ordre
-  var ORDRE_ACCUEIL = ['chantier-riviera-bonoumin', 'projet-01', 'chantier-angre-chateau'];
+  var ORDRE_ACCUEIL = ['chantier-riviera-bonoumin', 'projet-01', 'chantier-angre-chateau', 'chantier-angre-belle-cote'];
   function rangAccueil(p){ var i = ORDRE_ACCUEIL.indexOf(p.id); return i > -1 ? i : ORDRE_ACCUEIL.length + (D.projets || []).indexOf(p); }
   if (D.ordreAccueil && D.ordreAccueil.length) ORDRE_ACCUEIL = D.ordreAccueil;
 
